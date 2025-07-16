@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support\Providers;
 
+use App\Domains\Organization\Networks\OrganizationNetwork;
 use App\Domains\Organization\Tags\OrganizationTag;
 use App\Domains\Organization\Units\OrganizationUnit;
 use App\Domains\Organization\Users\OrganizationUser;
@@ -33,6 +34,7 @@ class SpatiePrefixedIdServiceProvider extends ServiceProvider
             'org_user-' => OrganizationUser::class,
             'org_unit-' => OrganizationUnit::class,
             'org_tag-' => OrganizationTag::class,
+            'org_network-' => OrganizationNetwork::class,
         ]);
     }
 }

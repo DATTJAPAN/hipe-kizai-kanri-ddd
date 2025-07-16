@@ -21,6 +21,9 @@ class Role extends Model
         'guard_name',
         'hierarchy',
         'is_app_defaults',
+        'is_app_default',
+        'org_id',
+        'org_type',
     ];
 
     public static function generateDefaultRolesForOrganization(Organization $organization): void

@@ -12,13 +12,14 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
             // Inherit nametag and url prefix "v1"
             Route::prefix('v1')
                 ->name('v1.')
+                ->middleware('web')
                 ->group(function () {
                     // Register 'request' with 'xhr_request_only' middleware
                     // --> additional middleware will be added inside the file
@@ -54,7 +55,7 @@ return Application::configure(basePath: dirname(__DIR__))
             })
             ->redirectGuestsTo(function () {
                 // if they try to access 'auth:*' or 'auth' URL
-                return route('get.system_login');
+                return route('v1.system-login:get');
             });
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -23,6 +23,7 @@ class OrganizationUser extends Authenticatable
         'email',
         'username',
         'password',
+        'org_id',
     ];
 
     protected $setting_relation = 'userDefinedSettings';

@@ -31,8 +31,12 @@ final class SystemAuthController extends AuthenticationService
         try {
             $this->authenticate($request);
 
+
             return successResponseJson([
                 'message' => 'Successfully logged in. Welcome Back! '.auth()?->user()?->email,
+                'data' => [
+                    'redirect_to' => route('dashboard'),
+                ]
             ]);
         } catch (TooManyAuthAttemptException|InvalidCredentialsException $e) {
             return errorResponseJson(['message' => $e->getMessage()],

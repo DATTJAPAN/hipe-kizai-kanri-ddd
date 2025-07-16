@@ -36,7 +36,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
         axios
             .post<ApiResponse>(
-                route('post.system_login'),
+                route('v1.system-login:post'),
                 { ...data },
                 {
                     headers: {

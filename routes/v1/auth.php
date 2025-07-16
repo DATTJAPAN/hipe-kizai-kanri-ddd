@@ -12,7 +12,8 @@ use App\Domains\System\Auth\SystemAuthController;
 
 // Ensure the user is not "authenticated"
 Route::middleware('guest')->group(function () {
-    Route::get('system-login', [SystemAuthController::class, 'processSystemSignIn'])->name('system-login:get');
+    Route::get('system-login', [SystemAuthController::class, 'systemLoginPage'])->name('system-login:get');
+    Route::post('system-login', [SystemAuthController::class, 'processSystemSignIn'])->name('system-login:post');
 });
 
 // Ensure the user is "authenticated" and with a "system" guard
