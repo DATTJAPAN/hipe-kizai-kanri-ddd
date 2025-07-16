@@ -72,8 +72,6 @@ if (! function_exists('checkClassTraits')) {
             $class = get_class($class);
         }
 
-        $found = in_array($needle, class_uses_recursive($class), true);
-
-        return (bool) ($found);
+        return in_array($needle, class_uses_recursive($class), true);
     }
 }

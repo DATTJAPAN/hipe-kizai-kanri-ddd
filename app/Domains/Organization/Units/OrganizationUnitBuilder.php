@@ -137,7 +137,7 @@ class OrganizationUnitBuilder
 
     private function validateParentRelationship(array &$attributes): void
     {
-        if (!$this->supposedParent) {
+        if (! $this->supposedParent) {
             return;
         }
 
@@ -146,7 +146,7 @@ class OrganizationUnitBuilder
         }
 
         // if the child is not strict but the parent is
-        if ($this->supposedParent->isStrictMode() && !$this->strictHierarchy) {
+        if ($this->supposedParent->isStrictMode() && ! $this->strictHierarchy) {
             throw OrganizationUnitBuilderException::parentInStrictButChildIsNot();
         }
 
@@ -154,11 +154,11 @@ class OrganizationUnitBuilder
 
         // if the child is strict
         if ($this->strictHierarchy) {
-            if (!$this->supposedParent->isStrictMode()) {
+            if (! $this->supposedParent->isStrictMode()) {
                 throw OrganizationUnitBuilderException::parentIsNotOnStrictMode();
             }
 
-            if (!$this->currentType->isValidHierarchy($parentType)) {
+            if (! $this->currentType->isValidHierarchy($parentType)) {
                 throw OrganizationUnitBuilderException::parentHierarchyIsInvalid();
             }
         }
@@ -170,7 +170,7 @@ class OrganizationUnitBuilder
     {
         $parentType = $this->supposedParent->type;
 
-        if (!$parentType instanceof OrganizationUnitType) {
+        if (! $parentType instanceof OrganizationUnitType) {
             $parentType = OrganizationUnitType::tryFrom($parentType);
 
             if (null === $parentType) {

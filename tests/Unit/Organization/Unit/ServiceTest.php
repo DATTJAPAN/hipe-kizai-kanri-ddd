@@ -15,12 +15,14 @@ use App\Domains\Shared\Domains\Organizations\Organization;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class OrganizationServiceTest extends TestCase
+class ServiceTest extends TestCase
 {
     use RefreshDatabase;
 
     private OrganizationUnitService $service;
+
     private Organization $org;
+
     private OrganizationUser $orgUser;
 
     protected function setUp(): void
@@ -29,33 +31,6 @@ class OrganizationServiceTest extends TestCase
         $this->service = new OrganizationUnitService();
         $this->org = $this->generateRandomOrganization()['organization'];
         $this->orgUser = $this->org->users->first();
-    }
-
-    private function createUnitBuilder(
-        string               $name,
-        string               $code,
-        string               $description,
-        OrganizationUnitType $type,
-        bool                 $strictHierarchy = false,
-        ?OrganizationUnit    $parent = null
-    ): OrganizationUnitBuilder
-    {
-        $builder = new OrganizationUnitBuilder();
-        $builder->setName($name)
-            ->setCode($code)
-            ->setDescription($description)
-            ->setType($type)
-            ->setActive(true)
-            ->setStrictHierarchy($strictHierarchy)
-            ->setOrganization($this->org)
-            ->setHeadOrgUser($this->orgUser)
-            ->setCreatorOrgUser($this->orgUser);
-
-        if ($parent) {
-            $builder->setHasParentUnit($parent);
-        }
-
-        return $builder;
     }
 
     /**
@@ -204,5 +179,31 @@ class OrganizationServiceTest extends TestCase
             true,
             $parentUnit
         )->build();
+    }
+
+    private function createUnitBuilder(
+        string $name,
+        string $code,
+        string $description,
+        OrganizationUnitType $type,
+        bool $strictHierarchy = false,
+        ?OrganizationUnit $parent = null
+    ): OrganizationUnitBuilder {
+        $builder = new OrganizationUnitBuilder();
+        $builder->setName($name)
+            ->setCode($code)
+            ->setDescription($description)
+            ->setType($type)
+            ->setActive(true)
+            ->setStrictHierarchy($strictHierarchy)
+            ->setOrganization($this->org)
+            ->setHeadOrgUser($this->orgUser)
+            ->setCreatorOrgUser($this->orgUser);
+
+        if ($parent) {
+            $builder->setHasParentUnit($parent);
+        }
+
+        return $builder;
     }
 }

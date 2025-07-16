@@ -17,19 +17,16 @@ class OrganizationUnitFactory extends Factory
 
     public function definition(): array
     {
-        $type = $this->faker->randomElement(OrganizationUnitType::values());
-
-        if (is_string($type)) {
-            $type = OrganizationUnitType::tryFrom($type);
-        }
+        $type = OrganizationUnitType::DEPARTMENT;
 
         return [
             'name' => $type->name.' - '.str()->random(10),
             'description' => $this->faker->paragraph(),
             'type' => $type->name,
             'code' => mb_strtoupper(Str::random(6)),
-            'is_active' => $this->faker->boolean(80), // 80% chance of being active
+            'is_active' => $this->faker->boolean(100), // 80% chance of being active
             'hierarchy' => $type->defaultHierarchyLevel(),
+            'is_strict_hierarchy' => true,
             // set via state
             'head_org_user_id' => null,
             'org_id' => null,

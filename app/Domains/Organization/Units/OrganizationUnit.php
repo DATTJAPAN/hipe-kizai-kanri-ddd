@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Domains\Organization\Units;
 
 use App\Domains\Organization\Users\OrganizationUser;
-use App\Domains\Shared\Domains\Organizations\HasAffiliatedOrganization;
+use App\Domains\Shared\Domains\Organizations\HasOrganization;
 use App\Support\Traits\Model\ModelExtension;
 use Database\Factories\OrganizationUnitFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,8 +17,8 @@ use Spatie\PrefixedIds\Models\Concerns\HasPrefixedId;
 
 class OrganizationUnit extends Model
 {
-    use HasAffiliatedOrganization;
     use HasFactory;
+    use HasOrganization;
     use HasPrefixedId;
     use ModelExtension;
 

@@ -24,6 +24,7 @@ return new class extends Migration
             $table->rememberToken();
             // --------------
             $table->foreignId('creator_id')
+                ->index()
                 ->nullable()
                 ->constrained(
                     table: 'system_users',

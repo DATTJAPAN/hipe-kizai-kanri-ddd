@@ -6,6 +6,8 @@ namespace App\Domains\Organization\Units;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+use InvalidArgumentException;
+use Throwable;
 
 class OrganizationUnitService
 {
@@ -21,7 +23,6 @@ class OrganizationUnitService
         $this->repository = new OrganizationUnitRepository(model: $this->modelInstance);
         $this->exception = new OrganizationUnitException();
     }
-
 
     /**
      * @throws OrganizationUnitBuilderException
@@ -42,13 +43,13 @@ class OrganizationUnitService
         try {
             $created = $this->repository->create($data);
 
-            if (!$created instanceof OrganizationUnit) {
+            if (! $created instanceof OrganizationUnit) {
                 throw $this->exception::createFailed();
             }
 
             return $created;
 
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             throw $this->exception::invalidData($e->getMessage());
         } catch (ModelNotFoundException $e) {
             throw $this->exception::createFailed($e->getMessage());
@@ -59,7 +60,7 @@ class OrganizationUnitService
                 );
             }
             throw $this->exception::unexpected($e->getMessage());
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             throw $this->exception::unexpected($e->getMessage());
         }
     }

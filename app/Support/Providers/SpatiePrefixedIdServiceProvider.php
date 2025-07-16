@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support\Providers;
 
+use App\Domains\Organization\Tags\OrganizationTag;
 use App\Domains\Organization\Units\OrganizationUnit;
 use App\Domains\Organization\Users\OrganizationUser;
 use App\Domains\Shared\Domains\Authorization\Permission;
@@ -31,6 +32,7 @@ class SpatiePrefixedIdServiceProvider extends ServiceProvider
             'org-' => Organization::class,
             'org_user-' => OrganizationUser::class,
             'org_unit-' => OrganizationUnit::class,
+            'org_tag-' => OrganizationTag::class,
         ]);
     }
 }

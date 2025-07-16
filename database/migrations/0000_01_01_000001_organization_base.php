@@ -7,7 +7,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -24,6 +25,7 @@ return new class extends Migration {
             $table->string('domain')->unique()->nullable();
             $table->json('alt_domains')->nullable();
             $table->foreignId('creator_id')
+                ->index()
                 ->constrained(
                     table: 'system_users',
                     column: 'id',
@@ -46,6 +48,7 @@ return new class extends Migration {
             $table->rememberToken();
             // --------------
             $table->foreignId('org_id')
+                ->index()
                 ->constrained(
                     table: 'organizations',
                     column: 'id',
@@ -94,6 +97,7 @@ return new class extends Migration {
             $table->boolean('is_active')->default(true);
             // --------------
             $table->foreignId('parent_unit_id')
+                ->index()
                 ->nullable()
                 ->constrained(
                     table: 'organization_units',
@@ -103,6 +107,7 @@ return new class extends Migration {
                 ->onUpdate('cascade');
 
             $table->foreignId('head_org_user_id')
+                ->index()
                 ->nullable()
                 ->constrained(
                     table: 'organization_users',
@@ -112,6 +117,7 @@ return new class extends Migration {
                 ->onUpdate('cascade');
 
             $table->foreignId('org_id')
+                ->index()
                 ->constrained(
                     table: 'organizations',
                     column: 'id',
@@ -120,6 +126,7 @@ return new class extends Migration {
                 ->onUpdate('cascade');
 
             $table->foreignId('creator_org_user_id')
+                ->index()
                 ->constrained(
                     table: 'organization_users',
                     column: 'id',
@@ -149,8 +156,21 @@ return new class extends Migration {
                 ->onDelete('cascade');
 
             $table->string('role')->nullable(); // role within the unit
-            $table->timestamps();
+
+            // ---- Relations and Constraints
             $table->unique(['org_unit_id', 'org_user_id']);
+
+            $table->foreignId('org_id')
+                ->nullable()
+                ->index()
+                ->constrained(
+                    table: 'organizations',
+                    column: 'id',
+                )
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+            $table->timestamps();
+
         });
 
         Schema::create('organization_tags', static function (Blueprint $table) {
@@ -161,6 +181,7 @@ return new class extends Migration {
             $table->string('code')->unique()->nullable();
             // --------------
             $table->foreignId('org_id')
+                ->index()
                 ->constrained(
                     table: 'organizations',
                     column: 'id',
@@ -169,6 +190,8 @@ return new class extends Migration {
                 ->onUpdate('cascade');
 
             $table->foreignId('creator_org_user_id')
+                ->nullable()
+                ->index()
                 ->constrained(
                     table: 'organization_users',
                     column: 'id',
@@ -176,6 +199,7 @@ return new class extends Migration {
                 ->onDelete('set null')
                 ->onUpdate('cascade');
 
+            $table->timestamps();
         });
 
         Schema::create('organization_taggables', static function (Blueprint $table) {
@@ -186,6 +210,7 @@ return new class extends Migration {
             // ---- Relations and Constraints
             $table->foreignId('org_id')
                 ->nullable()
+                ->index()
                 ->constrained(
                     table: 'organizations',
                     column: 'id',
