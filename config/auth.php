@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Domains\Organization\Users\OrganizationUser;
 use App\Domains\System\Users\SystemUser;
 
 return [
@@ -69,10 +70,10 @@ return [
     */
 
     'providers' => [
-        //        'users' => [
-        //            'driver' => 'eloquent',
-        //            'model' => env('AUTH_MODEL', App\Models\User::class),
-        //        ],
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', OrganizationUser::class),
+        ],
 
         'system_users' => [
             'driver' => 'eloquent',

@@ -13,17 +13,35 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_syste_login_screen_can_be_rendered()
+    public function test_login_screen_can_be_rendered()
     {
-        $response = $this->get('/system-login');
+        $response = $this->get('/v1/login');
         $response->assertStatus(200);
     }
 
-    public function test_users_can_authenticate_using_the_login_screen()
+    public function test_system_login_screen_can_be_rendered()
+    {
+        $response = $this->get('/v1/system-login');
+        $response->assertStatus(200);
+    }
+
+    public function test_org_users_can_authenticate_using_the_login_screen()
+    {
+        $orgUser = $this->generateRandomOrganization()['organization_user'];
+
+        $this->post('/v1/login', [
+            'email' => $orgUser->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated('web');
+    }
+
+    public function test_system_users_can_authenticate_using_the_login_screen(): void
     {
         $user = SystemUser::factory()->create();
 
-        $response = $this->post('/system-login', [
+        $this->post('/v1/system-login', [
             'email' => $user->email,
             'password' => 'password',
         ]);

@@ -12,8 +12,8 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__ . '/../routes/web.php',
-        commands: __DIR__ . '/../routes/console.php',
+        web: __DIR__.'/../routes/web.php',
+        commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
             // Inherit nametag and url prefix "v1"
@@ -48,14 +48,17 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        // TODO:
         $middleware
             ->redirectUsersTo(function () {
-                return route('dashboard');
+                return 'system' === activeGuard()
+                    ? '/sys/'
+                    : route('v1.org.dashboard:get');
             })
             ->redirectGuestsTo(function () {
                 // if they try to access 'auth:*' or 'auth' URL
-                return route('v1.system-login:get');
+                return 'system' === activeGuard()
+                    ? route('v1.system_login:get')
+                    : route('v1.login:get');
             });
     })
     ->withExceptions(function (Exceptions $exceptions) {

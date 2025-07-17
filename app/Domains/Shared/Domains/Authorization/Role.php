@@ -26,6 +26,10 @@ class Role extends Model
         'org_type',
     ];
 
+    // ------------------------------------------------------------------------------
+    // Model Custom Methods
+    // ------------------------------------------------------------------------------
+
     public static function generateDefaultRolesForOrganization(Organization $organization): void
     {
         $roles = config('role_permission.role.web');

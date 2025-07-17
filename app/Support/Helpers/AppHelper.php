@@ -12,7 +12,7 @@ if (! function_exists('responseJson')) {
         array $data = [],
         int $httpStatus = 200,
         array $headers = []
-    ) {
+    ): Illuminate\Http\JsonResponse {
         $payload = array_merge([
             'origin' => $origin,
             'status' => $status,
@@ -29,7 +29,7 @@ if (! function_exists('successResponseJson')) {
     function successResponseJson(
         array $data = [],
         array $headers = []
-    ) {
+    ): Illuminate\Http\JsonResponse {
         return responseJson('server', 'success', $data, 200, $headers);
     }
 }
@@ -42,7 +42,7 @@ if (! function_exists('failedResponseJson')) {
     function failedResponseJson(
         array $data = [],
         array $headers = []
-    ) {
+    ): Illuminate\Http\JsonResponse {
         return responseJson('server', 'failed', $data, 200, $headers);
     }
 }
@@ -56,7 +56,7 @@ if (! function_exists('errorResponseJson')) {
         array $data = [],
         int $httpStatus = 400,
         array $headers = []
-    ) {
+    ): Illuminate\Http\JsonResponse {
         return responseJson('server', 'error', $data, $httpStatus, $headers);
     }
 }

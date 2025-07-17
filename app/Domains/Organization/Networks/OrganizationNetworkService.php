@@ -24,7 +24,6 @@ class OrganizationNetworkService
         $this->exception = new OrganizationNetworkException();
     }
 
-
     public function create(array $data): OrganizationNetwork
     {
         $data = $this->modelInstance->filterFillableAttributes($data);
@@ -32,7 +31,7 @@ class OrganizationNetworkService
         try {
             $created = $this->repository->create($data);
 
-            if (!$created instanceof OrganizationNetwork) {
+            if (! $created instanceof OrganizationNetwork) {
                 throw $this->exception::createFailed();
             }
 
@@ -54,7 +53,6 @@ class OrganizationNetworkService
         }
     }
 
-
     public function update(int $id, array $data): OrganizationNetwork
     {
         try {
@@ -64,7 +62,7 @@ class OrganizationNetworkService
 
             $model = $this->repository->update($id, $data);
 
-            if (!$model instanceof OrganizationNetwork) {
+            if (! $model instanceof OrganizationNetwork) {
                 throw $this->exception::updateFailed();
             }
 
@@ -78,13 +76,12 @@ class OrganizationNetworkService
         }
     }
 
-
     public function delete(int $id): bool
     {
         try {
             $deleted = $this->repository->delete($id);
 
-            if (!$deleted) {
+            if (! $deleted) {
                 throw $this->exception::deleteFailed();
             }
 

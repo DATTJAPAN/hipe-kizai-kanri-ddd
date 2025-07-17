@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Domains\Organization\Auth;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class OrganizationLoginRequest extends FormRequest
+{
+    public function rules(): array
+    {
+        return [
+            'email' => ['nullable', 'email', 'max:254'],
+            'password' => ['nullable'],
+        ];
+    }
+
+    public function authorize(): bool
+    {
+        return true;
+    }
+}

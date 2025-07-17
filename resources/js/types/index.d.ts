@@ -1,3 +1,4 @@
+import { AppEnvironment, AuthScope, GuardScope } from '@/types/app';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
@@ -24,10 +25,13 @@ export interface NavItem {
 
 export interface SharedData {
     name: string;
+    env?: AppEnvironment;
+    scope?: GuardScope;
     quote: { message: string; author: string };
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    context: string | (Record<string, unknown> & AuthScope) | undefined;
 
     [key: string]: unknown;
 }

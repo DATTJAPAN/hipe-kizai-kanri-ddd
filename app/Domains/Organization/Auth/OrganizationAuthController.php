@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domains\System\Auth;
+namespace App\Domains\Organization\Auth;
 
 use App\Core\Authentication\AuthenticationService;
 use App\Core\Authentication\InvalidCredentialsException;
@@ -12,12 +12,13 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-final class SystemAuthController extends AuthenticationService
+final class OrganizationAuthController extends AuthenticationService
 {
     public function __construct()
     {
-        $this->setGuard('system');
+        $this->setGuard('web');
         inertia()->share('context', ['scope' => $this->guard]);
+
     }
 
     public function getLogin(): Response
@@ -28,14 +29,12 @@ final class SystemAuthController extends AuthenticationService
     /**
      * @throws InvalidCredentialsException
      */
-    public function postLogin(SystemLoginRequest $request): JsonResponse
+    public function postLogin(OrganizationLoginRequest $request): JsonResponse
     {
         try {
             $this->authenticate($request);
 
-            return successResponseJson([
-                'message' => 'Successfully logged in. Welcome Back! '.auth()?->user()?->email,
-            ]);
+            return successResponseJson(['message' => 'Successfully logged in. Welcome Back! '.auth()?->user()?->email]);
         } catch (TooManyAuthAttemptException|InvalidCredentialsException $e) {
             return errorResponseJson(['message' => $e->getMessage()],
                 httpStatus: $e->getStatusCode() ?? 403

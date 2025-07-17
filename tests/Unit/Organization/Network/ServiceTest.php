@@ -17,8 +17,11 @@ class ServiceTest extends TestCase
     use RefreshDatabase;
 
     private OrganizationNetworkService $service;
+
     private Organization $org;
+
     private OrganizationUser $orgUser;
+
     private string $dbTable;
 
     protected function setUp(): void

@@ -44,23 +44,11 @@ class Organization extends Model implements HasPermissionContract
     // ------------------------------------------------------------------------------
     protected static function booted(): void
     {
-        static::created(static function ($organization) {
-            // Create a default user:
-            OrganizationUser::create([
-                'org_id' => $organization->id,
-                'email' => sprintf('super@%s',
-                    str($organization->business_email)
-                        ->lower()
-                        ->afterLast('@')
-                        ->trim()
-                        ->toString()
-                ),
-                'username' => 'super',
-                'password' => 'super',
-            ]);
-
+        static::created(static function (self $self) {
+            // Generate super user:
+            OrganizationUser::generateDefaultSuperUserForOrganization($self);
             // Generate default roles
-            Role::generateDefaultRolesForOrganization($organization);
+            Role::generateDefaultRolesForOrganization($self);
         });
     }
 

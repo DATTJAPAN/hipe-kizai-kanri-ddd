@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Organization\Networks;
 
 use App\Domains\Organization\Users\HasOrganizationCreator;
@@ -24,12 +26,11 @@ class OrganizationNetwork extends Model
         'cidr',
         'broadcast',
         'org_id',
-        'creator_org_user_id'
+        'creator_org_user_id',
     ];
 
     // ------------------------------------------------------------------------------
     // Model Custom Methods
     // ------------------------------------------------------------------------------
-
 
 }

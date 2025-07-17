@@ -1,16 +1,15 @@
-import AuthLayout from '@/layouts/v1/auth/AuthLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
-
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ApiResponse } from '@/types';
+import AuthLayout from '@/layouts/auth-layout';
+import { ApiResponse, type SharedData } from '@/types';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import axios from 'axios';
+import { LoaderCircle } from 'lucide-react';
+import { FormEventHandler } from 'react';
 
 type LoginForm = {
     email: string;
@@ -24,19 +23,29 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
-    const props = usePage().props;
+    const { scope } = usePage<SharedData>().props;
+
+    // By default lets assume it's a org user
+    let postActionUrl: string = route('v1.login:post');
+    let redirectUrl: string = route('v1.org.dashboard:get');
+
+    if (scope === 'system') {
+        postActionUrl = route('v1.system_login:post');
+        redirectUrl = route('v1.sys.dashboard:get');
+    }
 
     const { data, setData, processing, errors } = useForm<Required<LoginForm>>({
         email: '',
         password: '',
         remember: false,
     });
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
         axios
             .post<ApiResponse>(
-                route('v1.system-login:post'),
+                postActionUrl,
                 { ...data },
                 {
                     headers: {
@@ -47,6 +56,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             )
             .then((response) => {
                 console.log('Success:', response);
+                router.visit(redirectUrl);
             })
             .catch((error) => {
                 if (axios.isAxiosError(error)) {

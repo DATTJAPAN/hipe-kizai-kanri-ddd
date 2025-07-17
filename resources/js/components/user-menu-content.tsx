@@ -2,8 +2,8 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { ApiResponse, type User } from '@/types';
-import { Link } from '@inertiajs/react';
+import { ApiResponse, type SharedData, type User } from '@/types';
+import { Link, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { LogOut, Settings } from 'lucide-react';
 
@@ -12,13 +12,23 @@ interface UserMenuContentProps {
 }
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
+    const { scope } = usePage<SharedData>().props;
     const cleanup = useMobileNavigation();
+
+    // By default lets assume it's a org user
+    let postActionUrl: string = route('v1.logout:post');
+    let redirectUrl: string = route('v1.login:get');
+
+    if (scope === 'system') {
+        postActionUrl = route('v1.system_logout:post');
+        redirectUrl = route('v1.system_login:get');
+    }
 
     const handleLogout = () => {
         cleanup();
 
         axios
-            .post<ApiResponse>(route('post.system_logout'), {
+            .post<ApiResponse>(postActionUrl, {
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
@@ -26,6 +36,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             })
             .then((response) => {
                 console.log('Success:', response);
+                router.visit(redirectUrl);
             })
             .catch((error) => {
                 if (axios.isAxiosError(error)) {

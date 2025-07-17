@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Organization\Users;
 
+use App\Domains\Shared\Domains\Organizations\Organization;
 use App\Support\Traits\Model\HasSettingsTrait;
 use App\Support\Traits\Model\ModelExtension;
 use Database\Factories\OrganizationUserFactory;
@@ -26,7 +27,29 @@ class OrganizationUser extends Authenticatable
         'org_id',
     ];
 
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
     protected $setting_relation = 'userDefinedSettings';
+
+    // ------------------------------------------------------------------------------
+    // Model Custom Methods
+    // ------------------------------------------------------------------------------
+
+    public static function generateDefaultSuperUserForOrganization(
+        Organization $organization,
+        string $username = 'super',
+        string $password = 'password'
+    ): void {
+        (new self)::create([
+            'org_id' => $organization->id,
+            'email' => sprintf('%s@%s', str($username)->lower()->toString(), str($organization->business_email)->lower()->afterLast('@')->trim()->toString()),
+            'username' => $username,
+            'password' => $password,
+        ]);
+    }
 
     public function userDefinedSettings(): HasOne
     {

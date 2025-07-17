@@ -63,8 +63,14 @@ class TestDatabaseSeeder extends Seeder
         }
 
         $this->command->info('Seeding Organizations...');
-        // Example: create 3 Organizations
-        Organization::factory()->addRandomCreator()->count(3)->create();
+        // Example: create 2 Organizations
+        Organization::factory()->addRandomCreator()->create([
+            'name' => 'Datt Japan',
+            'business_email' => 'datt@datt.co.jp',
+            'domain' => 'datt.co.jp',
+            'alt_domains' => ['datt.co.jp'],
+        ]);
+        Organization::factory()->addRandomCreator()->count(2)->create();
 
         $this->command->info('Finished seeding Organizations.');
     }

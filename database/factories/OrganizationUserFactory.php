@@ -13,6 +13,8 @@ class OrganizationUserFactory extends Factory
 {
     protected $model = OrganizationUser::class;
 
+    protected static ?string $password;
+
     public function definition(): array
     {
         $username = 'user_'.str()->random(10);
@@ -20,7 +22,7 @@ class OrganizationUserFactory extends Factory
         return [
             'email' => fake()->unique()->safeEmail(),
             'username' => $username,
-            'password' => Hash::make('password'),
+            'password' => self::$password ??= Hash::make('password'),
         ];
     }
 
