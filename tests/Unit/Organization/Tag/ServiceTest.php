@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Organization\Tag;
+namespace Tests\Unit\Organization\Tag;
 
 use App\Domains\Organization\Tags\OrganizationTag;
 use App\Domains\Organization\Tags\OrganizationTagException;

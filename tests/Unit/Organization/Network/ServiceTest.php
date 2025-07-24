@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Organization\Network;
+namespace Tests\Unit\Organization\Network;
 
 use App\Domains\Organization\Networks\OrganizationNetwork;
 use App\Domains\Organization\Networks\OrganizationNetworkException;

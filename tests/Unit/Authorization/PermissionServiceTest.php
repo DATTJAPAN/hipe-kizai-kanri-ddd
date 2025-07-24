@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Authorization;
+namespace Tests\Unit\Authorization;
 
 use App\Domains\Shared\Domains\Authorization\PermissionException;
 use App\Domains\Shared\Domains\Authorization\PermissionService;

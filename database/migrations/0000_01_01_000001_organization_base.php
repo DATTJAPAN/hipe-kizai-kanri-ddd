@@ -26,6 +26,7 @@ return new class extends Migration
             $table->json('alt_domains')->nullable();
             $table->foreignId('creator_id')
                 ->index()
+                ->nullable()
                 ->constrained(
                     table: 'system_users',
                     column: 'id',
@@ -56,6 +57,7 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->foreignId('creator_org_user_id')
+                ->index()
                 ->nullable()
                 ->constrained(
                     table: 'organization_users',
@@ -127,6 +129,7 @@ return new class extends Migration
 
             $table->foreignId('creator_org_user_id')
                 ->index()
+                ->nullable()
                 ->constrained(
                     table: 'organization_users',
                     column: 'id',
@@ -170,7 +173,6 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->timestamps();
-
         });
 
         Schema::create('organization_tags', static function (Blueprint $table) {
@@ -253,6 +255,7 @@ return new class extends Migration
                 ->onUpdate('cascade');
             $table->foreignId('creator_org_user_id')
                 ->index()
+                ->nullable()
                 ->constrained(
                     table: 'organization_users',
                     column: 'id',
