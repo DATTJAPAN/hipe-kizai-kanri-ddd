@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Domains\Shared\Domains\Organizations\Organization;
+use App\Domains\Organization\Organizations\Organization;
 
 return [
     'role' => [

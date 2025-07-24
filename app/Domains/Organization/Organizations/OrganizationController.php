@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domains\Organization\Organization;
+namespace App\Domains\Organization\Organizations;
 
 use Inertia\Inertia;
 use Inertia\Response;

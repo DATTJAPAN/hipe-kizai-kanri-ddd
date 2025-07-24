@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domains\Organization\Units;
 
+use App\Domains\Organization\Organizations\HasOrganization;
 use App\Domains\Organization\Users\OrganizationUser;
-use App\Domains\Shared\Domains\Organizations\HasOrganization;
 use App\Support\Traits\Model\ModelExtension;
 use Database\Factories\OrganizationUnitFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

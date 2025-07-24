@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\System\Organizations;
 
-use App\Domains\Shared\Domains\Organizations\Organization;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use InvalidArgumentException;
 use Throwable;
@@ -18,11 +18,15 @@ readonly class OrganizationService
         $this->repository = new OrganizationRepository(new Organization());
     }
 
-    /**
-     * Create a new organization.
-     *
-     * @throws OrganizationException
-     */
+    public function getAll(): Collection
+    {
+        try {
+            return $this->repository->getList();
+        } catch (Throwable $e) {
+            throw OrganizationException::unexpected($e->getMessage());
+        }
+    }
+
     public function create(array $data): Organization
     {
         try {
@@ -42,11 +46,6 @@ readonly class OrganizationService
         }
     }
 
-    /**
-     * Update an organization.
-     *
-     * @throws OrganizationException
-     */
     public function update(int $id, array $data): Organization
     {
         try {
@@ -70,11 +69,6 @@ readonly class OrganizationService
         }
     }
 
-    /**
-     * Delete an organization.
-     *
-     * @throws OrganizationException
-     */
     public function delete(int $id): bool
     {
         try {

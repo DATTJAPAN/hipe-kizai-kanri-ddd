@@ -23,15 +23,20 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
-    const { scope } = usePage<SharedData>().props;
+    // Use the context to get the scope since the scope is for active guard
+    const { context } = usePage<SharedData>().props;
 
     // By default lets assume it's a org user
     let postActionUrl: string = route('v1.login:post');
     let redirectUrl: string = route('v1.org.dashboard:get');
+    let scope: string = 'web';
 
-    if (scope === 'system') {
+    const isSystemContext = (ctx: typeof context): boolean => ctx === 'system' || (typeof ctx === 'object' && ctx?.scope === 'system');
+
+    if (isSystemContext(context)) {
         postActionUrl = route('v1.system_login:post');
         redirectUrl = route('v1.sys.dashboard:get');
+        scope = 'system';
     }
 
     const { data, setData, processing, errors } = useForm<Required<LoginForm>>({
@@ -72,7 +77,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
             <Head title="Log in" />
 
-            <form className="flex flex-col gap-6" onSubmit={submit}>
+            <form className="flex flex-col gap-6" onSubmit={submit} data-scope={scope}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email address</Label>

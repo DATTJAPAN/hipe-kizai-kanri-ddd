@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domains\Shared\Domains\Organizations;
+namespace App\Domains\Organization\Organizations;
 
 use App\Domains\Organization\Users\OrganizationUser;
 use App\Domains\Shared\Domains\Authorization\Concerns\HasPermissions;
@@ -64,7 +64,8 @@ class Organization extends Model implements HasPermissionContract
     {
         return $this->makeMultiDomainPermission(
             $this,
-            resource: 'organization', actions: ['create', 'read', 'update', 'delete']
+            resource: 'organization',
+            actions: ['create', 'read', 'update', 'delete']
         );
     }
 }

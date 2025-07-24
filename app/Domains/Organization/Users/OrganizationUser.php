@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domains\Organization\Users;
 
-use App\Domains\Shared\Domains\Organizations\Organization;
+use App\Domains\Organization\Organizations\HasOrganization;
+use App\Domains\Organization\Organizations\Organization;
 use App\Support\Traits\Model\HasSettingsTrait;
 use App\Support\Traits\Model\ModelExtension;
 use Database\Factories\OrganizationUserFactory;
@@ -14,6 +15,7 @@ use Spatie\PrefixedIds\Models\Concerns\HasPrefixedId;
 
 class OrganizationUser extends Authenticatable
 {
+    use HasOrganization;
     use HasPrefixedId;
     use HasSettingsTrait;
     use ModelExtension;

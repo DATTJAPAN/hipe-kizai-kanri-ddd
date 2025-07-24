@@ -9,6 +9,8 @@ declare(strict_types=1);
  */
 
 // Ensure the user is not "authenticated"
+use App\Domains\System\Organizations\OrganizationController;
+
 Route::middleware('guest')->group(function () {});
 
 // Ensure the user is "authenticated" and with a "web" guard
@@ -19,12 +21,10 @@ Route::middleware('auth:system')
     ->prefix('sys')
     ->name('sys.')
     ->group(function () {
-
-        Route::prefix('org')
-            ->name('org.')
+        Route::prefix('orgs')
+            ->name('orgs.')
             ->group(function () {
-                // TODO:
-
+                Route::post('/', [OrganizationController::class, 'getAll'])
+                    ->name('get_all:post');
             });
-
     });

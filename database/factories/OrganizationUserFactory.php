@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Domains\Organization\Organizations\Organization;
 use App\Domains\Organization\Users\OrganizationUser;
-use App\Domains\Shared\Domains\Organizations\Organization;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 

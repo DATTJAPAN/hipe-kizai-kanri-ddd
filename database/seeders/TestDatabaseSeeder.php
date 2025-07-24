@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Domains\Organization\Organizations\Organization;
 use App\Domains\Organization\Units\OrganizationUnit;
-use App\Domains\Shared\Domains\Organizations\Organization;
 use App\Domains\System\Users\SystemUser;
 use Artisan;
 use Illuminate\Database\Seeder;
@@ -39,17 +39,20 @@ class TestDatabaseSeeder extends Seeder
         $this->command->info('Seeding System Users...');
 
         // Create a System User without a creator
-        $systemUser = SystemUser::factory()->create();
+        $systemUser = SystemUser::factory()->create([
+            'email' => 'super@super.com',
+            'username' => 'super',
+        ]);
 
         // Create a System User with the previous user as creator
-        SystemUser::factory()
-            ->for($systemUser, 'creator')
-            ->create();
+        // SystemUser::factory()
+        //     ->for($systemUser, 'creator')
+        //     ->create();
 
         // Create a System User with a random creator
-        SystemUser::factory()
-            ->addRandomCreator()
-            ->create();
+        // SystemUser::factory()
+        //     ->addRandomCreator()
+        //     ->create();
 
         $this->command->info('Finished seeding System Users.');
     }
@@ -83,6 +86,5 @@ class TestDatabaseSeeder extends Seeder
                 ->count(3)
                 ->create();
         });
-
     }
 }
