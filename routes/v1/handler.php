@@ -23,14 +23,10 @@ Route::middleware(['auth:system', 'auth'])
     ->prefix('sys')
     ->name('sys.')
     ->group(function () {
-        Route::get('/', [SystemController::class, 'dashboard'])->name('dashboard:get');
-
         // sys/orgs/**/*
         Route::prefix('orgs')
             ->name('orgs.')
             ->group(function () {
-                Route::get('/', [SystemOrganizationController::class, 'dashboard'])->name('dashboard:get');
-                Route::get('/add', [SystemOrganizationController::class, 'add'])->name('add:get');
-                Route::get('/manage/{prefixedId}', [SystemOrganizationController::class, 'manage'])->name('manage:get');
+                Route::post('/add', [SystemOrganizationController::class, 'addHandler'])->name('add:post');
             });
     });

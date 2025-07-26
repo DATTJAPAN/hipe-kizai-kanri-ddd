@@ -27,7 +27,7 @@ export default function SysOrgDataTable() {
             {/* --- Data Table --- */}
             <MantineReactTable table={table} />
 
-            {/* --- Alert Message --- */}
+            {/* --- Data Table Error Alert Message --- */}
             {error instanceof Error && (
                 <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
@@ -35,8 +35,7 @@ export default function SysOrgDataTable() {
                     <AlertDescription>{error.message}</AlertDescription>
                 </Alert>
             )}
-
-            {/* --- Skeleton --- */}
+            {/* --- Data Table Skeleton --- */}
             {isPending && <SkeletonDatatable />}
         </div>
     );

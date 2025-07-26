@@ -39,6 +39,15 @@ const characterLimit = {
 type CharacterLimitKey = keyof typeof characterLimit;
 
 const characterLimitFor = (type: CharacterLimitKey = 'default'): number => characterLimit[type] ?? characterLimit.default;
+const characterLimitForArray = (keys: string[], fallbackLimit?: number): Record<string, number> => {
+    const result: Record<string, number> = {};
 
-export { characterLimit, characterLimitFor };
+    for (const key of keys) {
+        result[key] = (characterLimit as Record<string, number>)[key] ?? fallbackLimit ?? characterLimit.default;
+    }
+
+    return result;
+};
+
+export { characterLimit, characterLimitFor, characterLimitForArray };
 export type { CharacterLimitKey };

@@ -12,8 +12,8 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
             // Inherit nametag and url prefix "v1"
@@ -32,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     // --> additional middleware can be added
                     require_once base_path('routes/v1/auth.php');
                     require_once base_path('routes/v1/page.php');
+                    require_once base_path('routes/v1/handler.php');
                 });
         }
     )

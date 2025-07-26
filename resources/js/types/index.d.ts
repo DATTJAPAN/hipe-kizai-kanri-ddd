@@ -31,7 +31,7 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
-    context: string | (Record<string, unknown> & AuthScope) | undefined;
+    context: string | (Record<string, unknown> & AuthScope & formContext) | undefined;
 
     [key: string]: unknown;
 }
