@@ -4,12 +4,12 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { FilePlus } from 'lucide-react';
-import SysOrgDataTable from './_datatable';
+import SysOrgDashboardDataTable from './_datatable';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Organization',
-        href: route('v1.sys.dashboard:get'),
+        href: route('v1.sys.orgs.dashboard:get'),
     },
 ];
 
@@ -26,7 +26,7 @@ export default function SysOrgDashboard() {
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button asChild variant="default" size="icon" className="h-9 w-9">
-                                        <Link href={route('v1.sys.orgs.add:get')}>
+                                        <Link href={route('v1.sys.orgs.manage:get')}>
                                             <FilePlus className="h-4 w-4" />
                                             <span className="sr-only">Add Organization</span>
                                         </Link>
@@ -38,7 +38,7 @@ export default function SysOrgDashboard() {
                     </TooltipProvider>
                 </div>
                 {/* --- Data Table --- */}
-                <SysOrgDataTable />
+                <SysOrgDashboardDataTable />
             </div>
         </AppLayout>
     );

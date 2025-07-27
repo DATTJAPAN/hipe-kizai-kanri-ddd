@@ -24,4 +24,14 @@ class OrganizationException extends Exception
     protected static string $invalidDataMessage = 'Invalid organization data provided';
 
     protected static string $unexpectedErrorMessage = 'An unexpected error occurred';
+
+    protected static string $duplicateMessage = 'Organization already exists';
+
+    public static function duplicate(?string $details = null): self
+    {
+        return new self(
+            self::formatMessage(static::$duplicateMessage, $details),
+            409
+        );
+    }
 }

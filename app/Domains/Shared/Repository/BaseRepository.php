@@ -58,9 +58,13 @@ abstract class BaseRepository implements BaseRepositoryContract
         return $this->model->with($relations)->find($id);
     }
 
+    public function getByPrefixedId(string $prefix, ?array $relations = []): ?Model
+    {
+        return $this->model::findByPrefixedIdOrFail($prefix);
+    }
+
     /**
-     * @throws ModelNotFoundException
-     * @throws InvalidArgumentException
+     * @throws Throwable
      */
     public function create(array $data, array $options = []): Model
     {
@@ -68,20 +72,16 @@ abstract class BaseRepository implements BaseRepositoryContract
             throw new InvalidArgumentException('Data array cannot be empty.');
         }
 
-        try {
-            return DB::transaction(function () use ($data, $options) {
-                /** @var Model $model */
-                $model = $this->model->create($data);
+        return DB::transaction(function () use ($data, $options) {
+            /** @var Model $model */
+            $model = $this->model->create($data);
 
-                if (! empty($options['with'])) {
-                    $model->load($options['with']);
-                }
+            if (! empty($options['with'])) {
+                $model->load($options['with']);
+            }
 
-                return $model;
-            });
-        } catch (Throwable $e) {
-            throw new ModelNotFoundException('Failed to create model: '.$e->getMessage());
-        }
+            return $model;
+        });
     }
 
     /**
@@ -97,6 +97,17 @@ abstract class BaseRepository implements BaseRepositoryContract
                 throw new ModelNotFoundException("Model with ID {$id} not found.");
             }
 
+            $model->update($data);
+
+            return $model->fresh();
+        });
+    }
+
+    public function updateByPrefixedId(string $prefixedId, array $data): Model
+    {
+        return DB::transaction(function () use ($prefixedId, $data) {
+            /** @var Model|null $model */
+            $model = $this->model->findByPrefixedIdOrFail($prefixedId);
             $model->update($data);
 
             return $model->fresh();

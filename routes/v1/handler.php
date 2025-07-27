@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Domains\Organization\Organizations\OrganizationController;
 use App\Domains\System\Organizations\OrganizationController as SystemOrganizationController;
-use App\Domains\System\System\SystemController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -28,5 +27,6 @@ Route::middleware(['auth:system', 'auth'])
             ->name('orgs.')
             ->group(function () {
                 Route::post('/add', [SystemOrganizationController::class, 'addHandler'])->name('add:post');
+                Route::post('/update/{prefixedId}', [SystemOrganizationController::class, 'updateHandler'])->name('update:post');
             });
     });

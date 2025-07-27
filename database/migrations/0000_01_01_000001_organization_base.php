@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('business_email')->unique()->nullable();
             $table->string('domain')->unique()->nullable();
             $table->json('alt_domains')->nullable();
-            $table->foreignId('creator_id')
+            $table->foreignId('creator_sys_user_id')
                 ->index()
                 ->nullable()
                 ->constrained(

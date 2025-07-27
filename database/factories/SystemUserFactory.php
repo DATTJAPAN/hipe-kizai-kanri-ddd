@@ -26,7 +26,7 @@ class SystemUserFactory extends Factory
     public function addRandomCreator(): self
     {
         return $this->afterCreating(function (SystemUser $systemUser) {
-            $systemUser->update(['creator_id' => SystemUser::query()->inRandomOrder()->value('id')]);
+            $systemUser->update(['creator_sys_user_id' => SystemUser::query()->inRandomOrder()->value('id')]);
         });
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Domains\Organization\Organizations\Organization;
+use App\Domains\Shared\Models\Organization;
 use App\Domains\System\Users\SystemUser;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -29,10 +29,8 @@ class OrganizationFactory extends Factory
     public function addRandomCreator(): self
     {
         return $this->state(function (array $attributes) {
-            $creatorId = SystemUser::query()->inRandomOrder()->value('id');
-
             return [
-                'creator_id' => $creatorId,
+                'creator_sys_user_id' => SystemUser::query()->inRandomOrder()->value('id'),
             ];
         });
     }

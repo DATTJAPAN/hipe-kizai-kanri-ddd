@@ -30,7 +30,6 @@ Route::middleware(['auth:system', 'auth'])
             ->name('orgs.')
             ->group(function () {
                 Route::get('/', [SystemOrganizationController::class, 'dashboard'])->name('dashboard:get');
-                Route::get('/add', [SystemOrganizationController::class, 'add'])->name('add:get');
-                Route::get('/manage/{prefixedId}', [SystemOrganizationController::class, 'manage'])->name('manage:get');
+                Route::get('/manage/{prefixedId?}', [SystemOrganizationController::class, 'manage'])->name('manage:get');
             });
     });

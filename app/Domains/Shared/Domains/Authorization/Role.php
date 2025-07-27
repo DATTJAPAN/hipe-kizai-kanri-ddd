@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Shared\Domains\Authorization;
 
-use App\Domains\Organization\Organizations\Organization;
+use App\Domains\Shared\Models\Organization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\PrefixedIds\Models\Concerns\HasPrefixedId;

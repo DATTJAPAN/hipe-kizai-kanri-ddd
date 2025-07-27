@@ -43,7 +43,7 @@ trait HasExceptionFactory
         );
     }
 
-    public static function notFound(int $id): self
+    public static function notFound(string|int $id): self
     {
         return new self(
             (static::$notFoundMessage ?? 'Resource not found')." ID: {$id}",

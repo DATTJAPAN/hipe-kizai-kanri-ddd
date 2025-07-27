@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\System\Organizations;
 
+use App\Domains\Shared\Models\Organization;
 use App\Domains\Shared\Repository\BaseRepository;
 
 /**
