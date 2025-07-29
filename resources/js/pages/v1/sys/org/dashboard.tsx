@@ -17,18 +17,24 @@ export default function SysOrgDashboard() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Organization" />
+
             {/* Data Table Toolbar */}
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 {/* --- Data Table Outside Toolbar --- */}
-                <div className="mb-4">
+                <div className="mb-1">
                     <TooltipProvider delayDuration={300}>
-                        <div className="flex flex-wrap items-center gap-2 border-b-1 bg-background p-2 shadow-sm">
+                        <div className="flex flex-wrap items-center gap-2 bg-background py-2 shadow-sm">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button asChild variant="default" size="icon" className="h-9 w-9">
+                                    <Button
+                                        asChild
+                                        variant="default"
+                                        size="default"
+                                        className="group border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700"
+                                    >
                                         <Link href={route('v1.sys.orgs.manage:get')}>
-                                            <FilePlus className="h-4 w-4" />
-                                            <span className="sr-only">Add Organization</span>
+                                            <FilePlus className="mr-2 h-4 w-4 text-white" />
+                                            Add Organization
                                         </Link>
                                     </Button>
                                 </TooltipTrigger>
@@ -37,6 +43,7 @@ export default function SysOrgDashboard() {
                         </div>
                     </TooltipProvider>
                 </div>
+
                 {/* --- Data Table --- */}
                 <SysOrgDashboardDataTable />
             </div>

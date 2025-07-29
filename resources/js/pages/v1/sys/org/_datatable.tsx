@@ -74,8 +74,18 @@ export default function SysOrgDashboardDataTable() {
                 <TooltipProvider delayDuration={300}>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button variant={showOnlyTrashed ? 'default' : 'outline'} size="sm" onClick={handleToggleOnlyTrashed} className="h-8">
-                                <Trash2 className="mr-2 h-4 w-4" />
+                            <Button
+                                variant={showOnlyTrashed ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={handleToggleOnlyTrashed}
+                                className={cn(
+                                    'h-8',
+                                    showOnlyTrashed
+                                        ? 'border-red-600 bg-red-600 text-white hover:bg-red-700'
+                                        : 'border-red-300 text-red-600 hover:border-red-400 hover:bg-red-50 hover:text-red-700',
+                                )}
+                            >
+                                <Trash2 className={cn('mr-2 h-4 w-4', showOnlyTrashed ? 'text-white' : 'text-red-500 group-hover:text-red-700')} />
                                 Only Trashed
                                 {showOnlyTrashed && <span className="ml-2 rounded-full bg-white/20 px-1.5 py-0.5 text-xs">{data.length}</span>}
                             </Button>
@@ -91,10 +101,17 @@ export default function SysOrgDashboardDataTable() {
                                 variant={showWithTrashed ? 'default' : 'outline'}
                                 size="sm"
                                 onClick={handleToggleWithTrashed}
-                                className="h-8"
+                                className={cn(
+                                    'group h-8',
+                                    showWithTrashed
+                                        ? 'border-amber-600 bg-amber-600 text-white hover:bg-amber-700'
+                                        : 'border-amber-300 text-amber-600 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700',
+                                )}
                                 disabled={showOnlyTrashed}
                             >
-                                <Archive className="mr-2 h-4 w-4" />
+                                <Archive
+                                    className={cn('mr-2 h-4 w-4', showWithTrashed ? 'text-white' : 'text-amber-500 group-hover:text-amber-700')}
+                                />
                                 Include Trashed
                             </Button>
                         </TooltipTrigger>
@@ -107,8 +124,19 @@ export default function SysOrgDashboardDataTable() {
 
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={handleRefetch} className="h-8" disabled={isPending || isFetching}>
-                                <RefreshCw className={cn('mr-2 h-4 w-4', (isPending || isFetching) && 'animate-spin')} />
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleRefetch}
+                                className="group h-8 border-blue-300 text-blue-600 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
+                                disabled={isPending || isFetching}
+                            >
+                                <RefreshCw
+                                    className={cn(
+                                        'mr-2 h-4 w-4 text-blue-500 group-hover:text-blue-700',
+                                        (isPending || isFetching) && 'animate-spin',
+                                    )}
+                                />
                                 Refresh
                             </Button>
                         </TooltipTrigger>
@@ -128,9 +156,14 @@ export default function SysOrgDashboardDataTable() {
             <TooltipProvider delayDuration={300}>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Button asChild variant="ghost" size="icon" className="h-8 w-8">
+                        <Button
+                            asChild
+                            variant="outline"
+                            size="icon"
+                            className="group h-8 w-8 border-green-300 text-green-600 hover:border-green-400 hover:bg-green-50 hover:text-green-700"
+                        >
                             <Link href={getManageUrl(row.original.prefixed_id, row.original.deleted_at)}>
-                                <SquarePen className="h-4 w-4" />
+                                <SquarePen className="h-4 w-4 text-green-500 group-hover:text-green-700" />
                                 <span className="sr-only">Manage Organization</span>
                             </Link>
                         </Button>
