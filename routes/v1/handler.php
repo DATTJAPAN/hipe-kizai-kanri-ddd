@@ -28,8 +28,8 @@ Route::middleware(['auth:system', 'auth'])
             ->group(function () {
                 Route::post('/add', [SystemOrganizationController::class, 'addHandler'])->name('add:post');
                 Route::put('/update/{prefixedId}', [SystemOrganizationController::class, 'updateHandler'])->name('update:put');
-                Route::delete('/deactivate/{prefixedId}', [SystemOrganizationController::class, 'deactivateHandler'])->name('deactivate:delete');
-                Route::delete('/delete/{prefixedId}', [SystemOrganizationController::class, 'deleteHandler'])->name('delete:delete');
+                Route::delete('/delete/{prefixedId}', [SystemOrganizationController::class, 'softDeleteHandler'])->name('soft_delete:delete');
+                Route::delete('/force-delete/{prefixedId}', [SystemOrganizationController::class, 'forceDeleteHandler'])->name('force_delete:delete');
                 Route::patch('/restore/{prefixedId}', [SystemOrganizationController::class, 'restoreHandler'])->name('restore:patch');
             });
     });

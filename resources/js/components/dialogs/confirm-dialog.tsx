@@ -36,7 +36,7 @@ export default function ConfirmDialog({
                             {cancelText}
                         </Button>
                     </DialogClose>
-                    <Button type="button" onClick={onConfirm}>
+                    <Button type="button" onClick={onConfirm} className="cursor-pointer">
                         {confirmText}
                     </Button>
                 </DialogFooter>

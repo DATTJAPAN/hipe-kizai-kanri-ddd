@@ -35,6 +35,8 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function showTrashedData(): self
     {
         $this->withTrashed = true;
+        // disable only trashed
+        $this->onlyTrashed = false;
 
         return $this;
     }
@@ -42,6 +44,8 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function showOnlyTrashedData(): self
     {
         $this->onlyTrashed = true;
+        // disable with trashed
+        $this->withTrashed = false;
 
         return $this;
     }

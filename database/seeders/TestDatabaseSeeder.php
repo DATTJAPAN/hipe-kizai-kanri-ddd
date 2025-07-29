@@ -41,7 +41,7 @@ class TestDatabaseSeeder extends Seeder
         // Create a System User without a creator
         $systemUser = SystemUser::factory()->create([
             'email' => 'super@super.com',
-            'username' => 'super',
+            'username' => 'super_'.str()->random(10),
         ]);
 
         // Create a System User with the previous user as creator

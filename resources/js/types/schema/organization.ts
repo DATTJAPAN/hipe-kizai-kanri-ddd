@@ -10,6 +10,7 @@ export type Organization = IdAndPrefixedId & {
     business_email: string;
     domain: string;
     alt_domains: string[];
+    deleted_at?: Date | string | null;
 };
 
 // =======================

@@ -62,13 +62,14 @@ export default function SysOrgManageOrg() {
                 <p className="mb-8 text-sm text-muted-foreground">Fill in the details about your organization.</p>
 
                 {/* Form */}
-                <SysOrgManageForm mode={MODE} formData={formMode?.data} onFormStateChange={checkFormState} />
+                <SysOrgManageForm mode={MODE}  formKey={formMode?.key}  formData={formMode?.data} onFormStateChange={checkFormState} />
 
                 <PersistentAlertDialog
                     show={MODE === 'unknown'}
                     persistCondition={MODE === 'unknown'}
                     title={'Something went wrong'}
                     description="This entry appears invalid or no longer exists."
+                    maxCloseClicks={5}
                     showRedirect
                     redirectPath={route('v1.sys.orgs.dashboard:get')}
                 />

@@ -4,26 +4,26 @@ declare(strict_types=1);
 
 namespace App\Domains\System\Organizations;
 
+use App\Domains\Shared\Data\Request\DatatableRequestData;
+use App\Domains\Shared\Data\Request\ModelRequestData;
 use App\Domains\Shared\Data\Response\ResponseFormData;
 use Exception;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Spatie\PrefixedIds\Exceptions\NoPrefixedModelFound;
 
-class OrganizationController
+readonly class OrganizationController
 {
-    public function __construct(private OrganizationService $service)
-    {
-    }
+    public function __construct(private OrganizationService $service) {}
 
     public function dashboard(): Response
     {
         return Inertia::render('v1/sys/org/dashboard');
     }
 
-    public function manage(?string $prefixedId = null): Response
+    public function manage(Request $request, ?string $prefixedId = null): Response
     {
-        // ---> We assume it's for create
+        // ---> We assume it's for creation
         if (is_null($prefixedId)) {
             return Inertia::render(
                 component: 'v1/sys/org/manage-org',
@@ -37,7 +37,13 @@ class OrganizationController
 
         // ---> We assume it's for update
         try {
-            $model = $this->service->findByPrefixedId($prefixedId);
+            $requestData = ModelRequestData::fromRequest(request: $request);
+
+            if ($requestData->trashed) {
+                $this->service->repository->showTrashedData();
+            }
+
+            $model = $this->service->findByPrefixedId(identifier: $prefixedId);
 
             return Inertia::render(
                 component: 'v1/sys/org/manage-org',
@@ -63,7 +69,7 @@ class OrganizationController
                 ]
             );
         } catch (Exception $e) {
-            logger()?->error('Unexpected error while loading organization: ' . $e->getMessage(), ['prefixed_id' => $prefixedId]);
+            logger()?->error('Unexpected error while loading organization: '.$e->getMessage(), ['prefixed_id' => $prefixedId]);
 
             return Inertia::render(
                 component: 'v1/sys/org/manage-org',
@@ -87,7 +93,8 @@ class OrganizationController
                 ['prefixedId' => $organization->prefixed_id]
             )->with('success', 'Organization created successfully!');
         } catch (Exception $e) {
-            logger()->error('Error adding organization: ' . $e->getMessage());
+            logger()?->error('Error adding organization: '.$e->getMessage());
+
             return redirect()
                 ->back()
                 ->withErrors(['error' => $e->getMessage()])
@@ -107,7 +114,7 @@ class OrganizationController
                 ['prefixedId' => $organization->prefixed_id]
             )->with('success', 'Organization created successfully!');
         } catch (Exception $e) {
-            logger()->error('Error adding organization: ' . $e->getMessage());
+            logger()?->error('Error adding organization: '.$e->getMessage());
 
             return redirect()
                 ->back()
@@ -116,14 +123,17 @@ class OrganizationController
         }
     }
 
-    public function deactivateHandler(string $prefixedId): \Illuminate\Http\RedirectResponse
+    public function softDeleteHandler(string $prefixedId): \Illuminate\Http\RedirectResponse
     {
         try {
             $this->service->deleteByIdOrPrefixedId(identifier: $prefixedId);
 
-            return to_route('v1.sys.orgs.manage:get', ['prefixedId' => $prefixedId])->with('success', 'Organization deactivated successfully!');
+            return to_route('v1.sys.orgs.manage:get', [
+                'prefixedId' => $prefixedId,
+                'trashed' => true,
+            ])->with('success', 'Organization deleted successfully!');
         } catch (Exception $e) {
-            logger()->error('Error deactivating organization: ' . $e->getMessage());
+            logger()?->error('Error deleted organization: '.$e->getMessage());
 
             return redirect()
                 ->back()
@@ -131,9 +141,55 @@ class OrganizationController
         }
     }
 
-    public function datatable()
+    public function restoreHandler(string $prefixedId): \Illuminate\Http\RedirectResponse
     {
         try {
+            $this->service->repository->showOnlyTrashedData();
+            $this->service->restoreByIdOrPrefixedId(identifier: $prefixedId);
+
+            return to_route('v1.sys.orgs.manage:get', ['prefixedId' => $prefixedId])->with('success', 'Organization restoring successfully!');
+        } catch (Exception $e) {
+            logger()?->error('Error restoring organization: '.$e->getMessage());
+
+            return redirect()
+                ->back()
+                ->withErrors(['error' => $e->getMessage()]);
+        }
+    }
+
+    public function forceDeleteHandler(string $prefixedId): \Illuminate\Http\RedirectResponse
+    {
+        try {
+            $this->service->repository->showOnlyTrashedData();
+            $this->service->repository->deletePermanently();
+            $result = $this->service->deleteByIdOrPrefixedId(identifier: $prefixedId);
+
+            return to_route('v1.sys.orgs.manage:get', [
+                'prefixedId' => $prefixedId,
+                'trashed' => true,
+                'forceDeleted' => $result,
+            ])->with('success', 'Organization force deleted successfully!');
+        } catch (Exception $e) {
+            logger()?->error('Error force deleting organization: '.$e->getMessage());
+
+            return redirect()
+                ->back()
+                ->withErrors(['error' => $e->getMessage()]);
+        }
+    }
+
+    public function datatable(DatatableRequestData $requestData): \Illuminate\Http\JsonResponse
+    {
+        try {
+
+            if ($requestData->onlyTrashed) {
+                $this->service->repository->showOnlyTrashedData();
+            }
+
+            if ($requestData->withTrashed) {
+                $this->service->repository->showTrashedData();
+            }
+
             $result = $this->service->dataTable();
 
             return successResponseJson([

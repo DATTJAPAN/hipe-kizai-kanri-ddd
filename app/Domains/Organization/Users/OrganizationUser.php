@@ -46,12 +46,13 @@ class OrganizationUser extends Authenticatable
         string $username = 'super',
         string $password = 'password'
     ): void {
+        $username = str($username)
+            ->lower()
+            ->toString().'_'.str()->random(10);
+
         (new self)::create([
             'org_id' => $organization->id,
-            'email' => sprintf('%s@%s',
-                str($username)
-                    ->lower()
-                    ->toString().'_'.str()->random(10),
+            'email' => sprintf('%s@%s', $username,
                 str($organization->business_email)
                     ->lower()
                     ->afterLast('@')

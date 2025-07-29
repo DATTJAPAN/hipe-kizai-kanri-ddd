@@ -19,18 +19,18 @@ use Throwable;
 abstract class BaseService implements BaseServiceInterface
 {
     /** @var TModel */
-    protected $model;
+    public $model;
 
     /** @var TRepository */
-    protected $repository;
+    public $repository;
 
     /** @var class-string<TException> */
-    protected $exceptionClass;
+    public $exceptionClass;
 
     /**
-     * @param TModel $model
-     * @param TRepository $repository
-     * @param class-string<TException> $exceptionClass
+     * @param  TModel  $model
+     * @param  TRepository  $repository
+     * @param  class-string<TException>  $exceptionClass
      */
     public function __construct($model, $repository, $exceptionClass)
     {
@@ -73,7 +73,7 @@ abstract class BaseService implements BaseServiceInterface
         try {
             $organization = $this->repository->create($data);
 
-            if (!$organization instanceof Organization) {
+            if (! $organization instanceof Organization) {
                 throw $this->exceptionClass::createFailed();
             }
 
@@ -82,7 +82,6 @@ abstract class BaseService implements BaseServiceInterface
             if (in_array($e->errorInfo[0] ?? '', ['23000', '23505'], true)) {
                 throw $this->exceptionClass::duplicate();
             }
-
             throw $this->exceptionClass::unexpected();
         } catch (Throwable $e) {
             throw $this->exceptionClass::unexpected();
@@ -112,8 +111,19 @@ abstract class BaseService implements BaseServiceInterface
         try {
             $result = $this->repository->deleteByIdOrPrefixedId(identifier: $identifier);
 
-            return !$result ? throw $this->exceptionClass::deleteFailed() : $result;
+            return ! $result ? throw $this->exceptionClass::deleteFailed() : $result;
 
+        } catch (Throwable $e) {
+            throw $this->exceptionClass::unexpected();
+        }
+    }
+
+    public function restoreByIdOrPrefixedId(int|string $identifier): bool
+    {
+        try {
+            $result = $this->repository->restoreByIdOrPrefixedId(identifier: $identifier);
+
+            return ! $result ? throw $this->exceptionClass::restoreFailed() : $result;
         } catch (Throwable $e) {
             throw $this->exceptionClass::unexpected();
         }
