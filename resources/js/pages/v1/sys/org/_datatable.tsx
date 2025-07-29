@@ -53,7 +53,7 @@ export default function SysOrgDashboardDataTable() {
     const getManageUrl = (prefixedId: string, deletedAt?: Date | string | null) => {
         const baseUrl = route('v1.sys.orgs.manage:get', prefixedId);
 
-        // Add a query string if the item is deleted or we're showing trashed items
+        // Add a query string if the item is deleted, or we're showing trashed items
         if (deletedAt != null && (showOnlyTrashed || showWithTrashed)) {
             return `${baseUrl}?trashed=true`;
         }
@@ -69,57 +69,55 @@ export default function SysOrgDashboardDataTable() {
         enableRowActions: true,
         positionActionsColumn: 'last',
         enableTopToolbar: true,
-        renderTopToolbar: () => (
-            <div className="flex items-center justify-between border-b bg-background p-4">
-                <div className="flex items-center space-x-2">
-                    <TooltipProvider delayDuration={300}>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant={showOnlyTrashed ? 'default' : 'outline'} size="sm" onClick={handleToggleOnlyTrashed} className="h-8">
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    Only Trashed
-                                    {showOnlyTrashed && <span className="ml-2 rounded-full bg-white/20 px-1.5 py-0.5 text-xs">{data.length}</span>}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                {showOnlyTrashed ? 'Showing only soft-deleted organizations' : 'Click to view only soft-deleted organizations'}
-                            </TooltipContent>
-                        </Tooltip>
+        renderTopToolbarCustomActions: () => (
+            <div className="flex items-center space-x-2">
+                <TooltipProvider delayDuration={300}>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant={showOnlyTrashed ? 'default' : 'outline'} size="sm" onClick={handleToggleOnlyTrashed} className="h-8">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Only Trashed
+                                {showOnlyTrashed && <span className="ml-2 rounded-full bg-white/20 px-1.5 py-0.5 text-xs">{data.length}</span>}
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            {showOnlyTrashed ? 'Showing only soft-deleted organizations' : 'Click to view only soft-deleted organizations'}
+                        </TooltipContent>
+                    </Tooltip>
 
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant={showWithTrashed ? 'default' : 'outline'}
-                                    size="sm"
-                                    onClick={handleToggleWithTrashed}
-                                    className="h-8"
-                                    disabled={showOnlyTrashed}
-                                >
-                                    <Archive className="mr-2 h-4 w-4" />
-                                    Include Trashed
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                {showWithTrashed
-                                    ? 'Currently showing active and soft-deleted organizations'
-                                    : 'Click to include soft-deleted organizations with active ones'}
-                            </TooltipContent>
-                        </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant={showWithTrashed ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={handleToggleWithTrashed}
+                                className="h-8"
+                                disabled={showOnlyTrashed}
+                            >
+                                <Archive className="mr-2 h-4 w-4" />
+                                Include Trashed
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            {showWithTrashed
+                                ? 'Currently showing active and soft-deleted organizations'
+                                : 'Click to include soft-deleted organizations with active ones'}
+                        </TooltipContent>
+                    </Tooltip>
 
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant="outline" size="sm" onClick={handleRefetch} className="h-8" disabled={isPending || isFetching}>
-                                    <RefreshCw className={cn('mr-2 h-4 w-4', (isPending || isFetching) && 'animate-spin')} />
-                                    Refresh
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>{isPending || isFetching ? 'Refreshing data...' : 'Click to refresh the data'}</TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                </div>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant="outline" size="sm" onClick={handleRefetch} className="h-8" disabled={isPending || isFetching}>
+                                <RefreshCw className={cn('mr-2 h-4 w-4', (isPending || isFetching) && 'animate-spin')} />
+                                Refresh
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>{isPending || isFetching ? 'Refreshing data...' : 'Click to refresh the data'}</TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
 
                 {/* Status indicator */}
-                <div className="text-sm text-muted-foreground">
+                <div className="ml-4 text-sm text-muted-foreground">
                     {showOnlyTrashed && 'Showing only trashed items'}
                     {showWithTrashed && !showOnlyTrashed && 'Showing active and trashed items'}
                     {!showOnlyTrashed && !showWithTrashed && 'Showing active items only'}

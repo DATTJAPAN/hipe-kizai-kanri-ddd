@@ -7,67 +7,92 @@ import SysOrgManageForm from '@/pages/v1/sys/org/_form';
 import { type BreadcrumbItem, SharedData } from '@/types';
 import { FormMode } from '@/types/app';
 import { Head, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 export default function SysOrgManageOrg() {
+    // ============ STATE MANAGEMENT ============
+    const [formIsDirty, setFormIsDirty] = useState(false);
+
+    // ============ DATA & ROUTE PARAMS ============
     const { context } = usePage<SharedData>().props;
     const { prefixedId } = route().params;
-
-    const CURRENT_PAGE_NAME: string = ' Manage Organization';
-    const ROUTE: string = route('v1.sys.orgs.manage:get', prefixedId ?? 'unknown');
-    let BADGE_PRESET: BadgePreset = 'create';
-    let MODE: FormMode = 'create';
-
-    const [formIsDirty, setFormIsDirty] = useState(false);
     const formMode = context?.form;
 
-    console.log(formMode);
+    // ============ CONSTANTS ============
+    const PAGE_CONFIG = useMemo(
+        () => ({
+            title: 'Manage Organization',
+            description: 'Fill in the details about your organization.',
+            route: route('v1.sys.orgs.manage:get', prefixedId ?? 'unknown'),
+        }),
+        [prefixedId],
+    );
 
-    if (formMode) {
-        if (formMode?.mode === 'edit' || formMode?.mode === 'manage' || formMode?.data) {
-            BADGE_PRESET = 'manage';
-            MODE = 'edit';
+    // ============ COMPUTED VALUES ============
+    const formState = useMemo(() => {
+        // Default state for create mode
+        let badgePreset: BadgePreset = 'create';
+        let mode: FormMode = 'create';
 
-            if (!formMode?.data || !formMode?.key) {
-                BADGE_PRESET = 'unknown';
-                MODE = 'unknown';
+        // Determine mode based on form data
+        if (formMode) {
+            const hasEditableData = formMode?.mode === 'edit' || formMode?.mode === 'manage' || formMode?.data;
+
+            if (hasEditableData) {
+                badgePreset = 'manage';
+                mode = 'edit';
+
+                // Check for invalid/missing data
+                if (!formMode?.data || !formMode?.key) {
+                    badgePreset = 'unknown';
+                    mode = 'unknown';
+                }
             }
         }
-    }
-    console.log(MODE === 'unknown');
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Organization',
-            href: route('v1.sys.orgs.dashboard:get'),
-        },
-        {
-            title: CURRENT_PAGE_NAME,
-            href: ROUTE,
-        },
-    ];
 
-    const checkFormState = (isDirty: boolean): void => {
+        return { badgePreset, mode };
+    }, [formMode]);
+
+    const breadcrumbs = useMemo(
+        (): BreadcrumbItem[] => [
+            {
+                title: 'Organization',
+                href: route('v1.sys.orgs.dashboard:get'),
+            },
+            {
+                title: PAGE_CONFIG.title,
+                href: PAGE_CONFIG.route,
+            },
+        ],
+        [PAGE_CONFIG.title, PAGE_CONFIG.route],
+    );
+
+    // ============ EVENT HANDLERS ============
+    const handleFormStateChange = useCallback((isDirty: boolean): void => {
         setFormIsDirty(isDirty);
-    };
+    }, []);
 
+    // ============ RENDER ============
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={CURRENT_PAGE_NAME} />
+            <Head title={PAGE_CONFIG.title} />
 
             <div className="min-h-screen w-full px-12 py-12">
-                <LabelConditional badgePreset={BADGE_PRESET} className="max-w-2xl" showDirtyBadge={formIsDirty}>
-                    <h2 className="mb-2 text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">{CURRENT_PAGE_NAME}</h2>
+                {/* Page Header */}
+                <LabelConditional badgePreset={formState.badgePreset} className="max-w-2xl" showDirtyBadge={formIsDirty}>
+                    <h2 className="mb-2 text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">{PAGE_CONFIG.title}</h2>
                 </LabelConditional>
 
-                <p className="mb-8 text-sm text-muted-foreground">Fill in the details about your organization.</p>
+                <p className="mb-8 text-sm text-muted-foreground">{PAGE_CONFIG.description}</p>
 
-                {/* Form */}
-                <SysOrgManageForm mode={MODE}  formKey={formMode?.key}  formData={formMode?.data} onFormStateChange={checkFormState} />
+                {/* Form Component */}
+                <SysOrgManageForm mode={formState.mode} formKey={formMode?.key} formData={formMode?.data} onFormStateChange={handleFormStateChange} />
 
+                {/* Error Dialog */}
                 <PersistentAlertDialog
-                    show={MODE === 'unknown'}
-                    persistCondition={MODE === 'unknown'}
-                    title={'Something went wrong'}
+                    show={formState.mode === 'unknown'}
+                    persistCondition={formState.mode === 'unknown'}
+                    title="Something went wrong"
                     description="This entry appears invalid or no longer exists."
                     maxCloseClicks={5}
                     showRedirect
