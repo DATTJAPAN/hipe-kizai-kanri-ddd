@@ -27,6 +27,9 @@ Route::middleware(['auth:system', 'auth'])
             ->name('orgs.')
             ->group(function () {
                 Route::post('/add', [SystemOrganizationController::class, 'addHandler'])->name('add:post');
-                Route::post('/update/{prefixedId}', [SystemOrganizationController::class, 'updateHandler'])->name('update:post');
+                Route::put('/update/{prefixedId}', [SystemOrganizationController::class, 'updateHandler'])->name('update:put');
+                Route::delete('/deactivate/{prefixedId}', [SystemOrganizationController::class, 'deactivateHandler'])->name('deactivate:delete');
+                Route::delete('/delete/{prefixedId}', [SystemOrganizationController::class, 'deleteHandler'])->name('delete:delete');
+                Route::patch('/restore/{prefixedId}', [SystemOrganizationController::class, 'restoreHandler'])->name('restore:patch');
             });
     });

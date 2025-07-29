@@ -1,4 +1,5 @@
 'use client';
+import ConfirmDialog from '@/components/dialogs/confirm-dialog';
 import InputCounter from '@/components/inputs/input-counter';
 import FormLabelConditional from '@/components/labels/form-label-conditional';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -29,8 +30,10 @@ export default function SysOrgManageForm({ mode, formData, onFormStateChange }: 
     const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
     const [syncDomainWithEmail, setSyncDomainWithEmail] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isConfirmAlertOpen, setIsConfirmAlertOpen] = useState(false);
+    const [confirmActionType, setConfirmActionType] = useState<'delete' | 'deactivate'>('delete');
 
-    const charLimits = organizationCharacterLimits;
+    const charLimits: Record<string, number> = organizationCharacterLimits;
 
     const defaultValues = {
         name: '',
@@ -40,7 +43,11 @@ export default function SysOrgManageForm({ mode, formData, onFormStateChange }: 
     };
 
     const DISABLE_FORM = mode === 'unknown';
-    const IS_FORM_EDIT_MODE: boolean = mode === 'edit' || mode === 'manage';
+    const IS_FORM_MANAGE_MODE: boolean = mode === 'manage';
+    const IS_FORM_EDIT_MODE: boolean = mode === 'edit' || IS_FORM_MANAGE_MODE;
+    const IS_FORM_HAS_DATA: boolean = formData !== null && formData !== undefined && Object.keys(formData).length > 0;
+    const IS_FORM_DATA_USE_SOFT_DELETE: boolean = IS_FORM_HAS_DATA && formData !== undefined && Object.hasOwn(formData, 'deleted_at');
+
     const useResolveForm = () => {
         const resolveDefaultValues = IS_FORM_EDIT_MODE ? { ...defaultValues, ...formData } : defaultValues;
 
@@ -50,14 +57,16 @@ export default function SysOrgManageForm({ mode, formData, onFormStateChange }: 
             defaultValues: resolveDefaultValues,
         });
     };
-
     const form = useResolveForm();
     const { watch, setValue, formState } = form;
-
     const { fields, append, remove } = useFieldArray({
         name: 'alt_domains' as const,
         control: form.control,
     });
+
+    // Get the data Identifier
+    const { prefixedId } = route().params;
+    const modelIdentifier: string = prefixedId ?? formData?.id ?? null;
 
     // listen to form dirty state
     useEffect(() => {
@@ -91,8 +100,7 @@ export default function SysOrgManageForm({ mode, formData, onFormStateChange }: 
         setIsSubmitting(true);
 
         if (IS_FORM_EDIT_MODE) {
-            const { prefixedId } = route().params;
-            return router.post(route('v1.sys.orgs.update:post', { prefixedId: prefixedId ?? formData?.id }), data, {
+            return router.put(route('v1.sys.orgs.update:put', { prefixedId: modelIdentifier }), data, {
                 onSuccess: () => {
                     setServerErrors({});
                     form.reset(data);
@@ -128,6 +136,45 @@ export default function SysOrgManageForm({ mode, formData, onFormStateChange }: 
 
     const _handleOnInvalid: SubmitErrorHandler<OrganizationCreateType | OrganizationUpdateType> = (errors) => {
         console.error('Form submission errors:', errors);
+    };
+
+    const _handleOpenConfirmation = (type: 'delete' | 'deactivate') => {
+        setConfirmActionType(type);
+        setIsConfirmAlertOpen(true);
+    };
+
+    const _handleExecuteConfirmedAction = () => {
+        if (confirmActionType === 'delete') {
+            _handlePermanentDelete();
+        }
+        if (confirmActionType === 'deactivate') {
+            _handleToggleStatus();
+        }
+    };
+
+    const _handlePermanentDelete = () => {
+        if (!IS_FORM_EDIT_MODE) {
+            return;
+        }
+
+        console.log('Permanent delete', route('v1.sys.orgs.delete:delete', modelIdentifier));
+    };
+
+    const _handleToggleStatus = () => {
+        if (!IS_FORM_EDIT_MODE) {
+            return;
+        }
+
+        router.delete(route('v1.sys.orgs.deactivate:delete', modelIdentifier), {
+            onSuccess: () => {
+                setServerErrors({});
+            },
+            onError: (errors) => {
+                console.error('Error deactivating organization:', errors);
+                setServerErrors(errors);
+            },
+            onFinish: () => {},
+        });
     };
 
     const getButtonText = () => {
@@ -280,7 +327,39 @@ export default function SysOrgManageForm({ mode, formData, onFormStateChange }: 
                     </div>
 
                     {/* Submit */}
-                    <div className="max-w-2xl pt-6">
+                    <div className="flex max-w-2xl items-center justify-end space-x-2 pt-6">
+                        {IS_FORM_EDIT_MODE && IS_FORM_DATA_USE_SOFT_DELETE && (
+                            <Button
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    _handleOpenConfirmation('deactivate');
+                                }}
+                                className="w-full cursor-pointer"
+                                role="button"
+                                disabled={DISABLE_FORM || isSubmitting}
+                            >
+                                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Deactivate
+                            </Button>
+                        )}
+
+                        {IS_FORM_EDIT_MODE && (
+                            <Button
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    _handleOpenConfirmation('delete');
+                                }}
+                                className="w-full cursor-pointer"
+                                role="button"
+                                disabled={DISABLE_FORM || isSubmitting}
+                            >
+                                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Permanently delete
+                            </Button>
+                        )}
+
                         <Button
                             type="submit"
                             className="w-full cursor-pointer"
@@ -316,6 +395,10 @@ export default function SysOrgManageForm({ mode, formData, onFormStateChange }: 
                     </div>
                 </form>
             </Form>
+
+            {IS_FORM_EDIT_MODE && !DISABLE_FORM && (
+                <ConfirmDialog open={isConfirmAlertOpen} onOpenChange={setIsConfirmAlertOpen} onConfirm={_handleExecuteConfirmedAction} />
+            )}
         </>
     );
 }

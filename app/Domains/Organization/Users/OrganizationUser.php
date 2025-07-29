@@ -26,6 +26,7 @@ class OrganizationUser extends Authenticatable
         'email',
         'username',
         'password',
+        'is_permanent',
         'org_id',
     ];
 
@@ -47,9 +48,19 @@ class OrganizationUser extends Authenticatable
     ): void {
         (new self)::create([
             'org_id' => $organization->id,
-            'email' => sprintf('%s@%s', str($username)->lower()->toString(), str($organization->business_email)->lower()->afterLast('@')->trim()->toString()),
+            'email' => sprintf('%s@%s',
+                str($username)
+                    ->lower()
+                    ->toString().'_'.str()->random(10),
+                str($organization->business_email)
+                    ->lower()
+                    ->afterLast('@')
+                    ->trim()
+                    ->toString()
+            ),
             'username' => $username,
             'password' => $password,
+            'is_permanent' => true,
         ]);
     }
 

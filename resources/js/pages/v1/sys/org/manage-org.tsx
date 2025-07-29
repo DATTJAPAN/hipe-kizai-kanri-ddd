@@ -1,5 +1,6 @@
 'use client';
 
+import PersistentAlertDialog from '@/components/dialogs/persistent-alert-dialog';
 import LabelConditional, { type BadgePreset } from '@/components/labels/label-coditional';
 import AppLayout from '@/layouts/app-layout';
 import SysOrgManageForm from '@/pages/v1/sys/org/_form';
@@ -20,6 +21,8 @@ export default function SysOrgManageOrg() {
     const [formIsDirty, setFormIsDirty] = useState(false);
     const formMode = context?.form;
 
+    console.log(formMode);
+
     if (formMode) {
         if (formMode?.mode === 'edit' || formMode?.mode === 'manage' || formMode?.data) {
             BADGE_PRESET = 'manage';
@@ -31,7 +34,7 @@ export default function SysOrgManageOrg() {
             }
         }
     }
-
+    console.log(MODE === 'unknown');
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Organization',
@@ -60,6 +63,15 @@ export default function SysOrgManageOrg() {
 
                 {/* Form */}
                 <SysOrgManageForm mode={MODE} formData={formMode?.data} onFormStateChange={checkFormState} />
+
+                <PersistentAlertDialog
+                    show={MODE === 'unknown'}
+                    persistCondition={MODE === 'unknown'}
+                    title={'Something went wrong'}
+                    description="This entry appears invalid or no longer exists."
+                    showRedirect
+                    redirectPath={route('v1.sys.orgs.dashboard:get')}
+                />
             </div>
         </AppLayout>
     );

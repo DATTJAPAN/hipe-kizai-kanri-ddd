@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Traits\Model;
 
 use DateTimeInterface;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 trait ModelExtension
@@ -103,5 +104,12 @@ trait ModelExtension
         }
 
         return null;
+    }
+
+    public function isUsingSoftDeletes(): bool
+    {
+        $targetClass = SoftDeletes::class;
+
+        return in_array($targetClass, class_uses_recursive($this), true);
     }
 }

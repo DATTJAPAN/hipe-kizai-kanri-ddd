@@ -24,7 +24,7 @@ Route::middleware('auth:system')
         Route::prefix('orgs')
             ->name('orgs.')
             ->group(function () {
-                Route::post('/', [OrganizationController::class, 'getAll'])
-                    ->name('get_all:post');
+                Route::post('/', [OrganizationController::class, 'datatable'])
+                    ->name('datatable:post');
             });
     });

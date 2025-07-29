@@ -43,9 +43,10 @@ return new class extends Migration
             $table->id();
             $table->string('prefixed_id')->nullable()->unique();
             // --------------
-            $table->string('username')->nullable();
+            $table->string('username')->unique()->nullable();
             $table->string('email')->unique()->nullable();
             $table->string('password')->nullable();
+            $table->boolean('is_permanent')->default(false);
             $table->rememberToken();
             // --------------
             $table->foreignId('org_id')

@@ -8,10 +8,13 @@ use App\Domains\Shared\Data\Response\ResponseFormData;
 use Exception;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\PrefixedIds\Exceptions\NoPrefixedModelFound;
 
 class OrganizationController
 {
-    public function __construct(private OrganizationService $service) {}
+    public function __construct(private OrganizationService $service)
+    {
+    }
 
     public function dashboard(): Response
     {
@@ -20,6 +23,7 @@ class OrganizationController
 
     public function manage(?string $prefixedId = null): Response
     {
+        // ---> We assume it's for create
         if (is_null($prefixedId)) {
             return Inertia::render(
                 component: 'v1/sys/org/manage-org',
@@ -31,6 +35,7 @@ class OrganizationController
             );
         }
 
+        // ---> We assume it's for update
         try {
             $model = $this->service->findByPrefixedId($prefixedId);
 
@@ -39,26 +44,26 @@ class OrganizationController
                 props: [
                     'context' => [
                         'form' => ResponseFormData::forPrefixed(
-                            data: OrganizationData::from($model)->toArray(),
+                            data: OrganizationResourceData::from($model)->toArray(),
                             id: $model?->prefixed_id
                         )->toArray(),
                     ],
                 ]
             );
         } catch (OrganizationException $e) {
-            logger()?->error('Organization not found: '.$e->getMessage(), ['prefixed_id' => $prefixedId]);
+            logger()?->error($e->getMessage(), ['prefixed_id' => $prefixedId]);
 
             return Inertia::render(
                 component: 'v1/sys/org/manage-org',
                 props: [
                     'context' => [
                         'form' => ResponseFormData::forMissingManage()->toArray(),
-                        'error' => 'Organization not found.',
+                        'error' => $e->getMessage(),
                     ],
                 ]
             );
         } catch (Exception $e) {
-            logger()?->error('Unexpected error while loading organization: '.$e->getMessage(), ['prefixed_id' => $prefixedId]);
+            logger()?->error('Unexpected error while loading organization: ' . $e->getMessage(), ['prefixed_id' => $prefixedId]);
 
             return Inertia::render(
                 component: 'v1/sys/org/manage-org',
@@ -72,16 +77,37 @@ class OrganizationController
         }
     }
 
-    public function addHandler(OrganizationData $data): \Illuminate\Http\RedirectResponse
+    public function addHandler(OrganizationFormData $data): \Illuminate\Http\RedirectResponse
     {
         try {
             $organization = $this->service->create($data->toArray());
 
-            return to_route('v1.sys.orgs.manage:get',
+            return to_route(
+                'v1.sys.orgs.manage:get',
                 ['prefixedId' => $organization->prefixed_id]
             )->with('success', 'Organization created successfully!');
         } catch (Exception $e) {
-            logger()->error('Error adding organization: '.$e->getMessage());
+            logger()->error('Error adding organization: ' . $e->getMessage());
+            return redirect()
+                ->back()
+                ->withErrors(['error' => $e->getMessage()])
+                ->withInput();
+        }
+    }
+
+    public function updateHandler(string $prefixedId, OrganizationFormData $data): \Illuminate\Http\RedirectResponse
+    {
+        try {
+            $organization = $this->service->updateByIdOrPrefixedId($prefixedId, $data->toArray());
+
+            // Todo: update all the user email domain if the company change domain to avoid duplication
+
+            return to_route(
+                'v1.sys.orgs.manage:get',
+                ['prefixedId' => $organization->prefixed_id]
+            )->with('success', 'Organization created successfully!');
+        } catch (Exception $e) {
+            logger()->error('Error adding organization: ' . $e->getMessage());
 
             return redirect()
                 ->back()
@@ -90,31 +116,28 @@ class OrganizationController
         }
     }
 
-    public function updateHandler(string $prefixedId, OrganizationData $data): \Illuminate\Http\RedirectResponse
+    public function deactivateHandler(string $prefixedId): \Illuminate\Http\RedirectResponse
     {
         try {
-            $organization = $this->service->updateByPrefixedId($prefixedId, $data->toArray());
+            $this->service->deleteByIdOrPrefixedId(identifier: $prefixedId);
 
-            return to_route('v1.sys.orgs.manage:get',
-                ['prefixedId' => $organization->prefixed_id]
-            )->with('success', 'Organization created successfully!');
+            return to_route('v1.sys.orgs.manage:get', ['prefixedId' => $prefixedId])->with('success', 'Organization deactivated successfully!');
         } catch (Exception $e) {
-            logger()->error('Error adding organization: '.$e->getMessage());
+            logger()->error('Error deactivating organization: ' . $e->getMessage());
 
             return redirect()
                 ->back()
-                ->withErrors(['error' => $e->getMessage()])
-                ->withInput();
+                ->withErrors(['error' => $e->getMessage()]);
         }
     }
 
-    public function getAll()
+    public function datatable()
     {
         try {
-            $this->service->getAll();
+            $result = $this->service->dataTable();
 
             return successResponseJson([
-                'data' => $this->service->getAll(),
+                'data' => $result,
             ]);
         } catch (Exception $e) {
             return errorResponseJson(

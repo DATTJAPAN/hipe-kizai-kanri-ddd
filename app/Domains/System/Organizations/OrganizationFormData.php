@@ -10,7 +10,7 @@ use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Data;
 
-class OrganizationData extends Data
+class OrganizationFormData extends Data
 {
     public function __construct(
         #[Required, Min(1), Max(100)]
@@ -23,8 +23,7 @@ class OrganizationData extends Data
         public string $domain,
 
         /** @var string[] */
-        public array $alt_domains = [],
-
+        public array $alt_domains,
     ) {}
 
     public static function rules(): array
@@ -53,7 +52,11 @@ class OrganizationData extends Data
                 'min:1',
                 'max:100',
                 function ($attribute, $value, $fail) {
-                    $query = \App\Domains\Shared\Models\Organization::where('domain', $value);
+                    // Single query to check if domain conflicts with main domain OR alt domains of other organizations
+                    $query = \App\Domains\Shared\Models\Organization::where(function ($q) use ($value) {
+                        $q->where('domain', $value) // Check against main domains
+                            ->orWhereJsonContains('alt_domains', $value); // Check against alt domains
+                    });
 
                     // If we have an ID (update operation), exclude current record
                     if (request()->route('prefixedId')) {
@@ -61,7 +64,7 @@ class OrganizationData extends Data
                     }
 
                     if ($query->exists()) {
-                        $fail('This domain is already taken by another organization.');
+                        $fail('This domain is already used by another organization as a main or alternative domain.');
                     }
                 },
             ],

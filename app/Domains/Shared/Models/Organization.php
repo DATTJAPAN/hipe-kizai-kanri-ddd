@@ -13,6 +13,7 @@ use App\Support\Traits\Model\ModelExtension;
 use Database\Factories\OrganizationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\PrefixedIds\Models\Concerns\HasPrefixedId;
 
 class Organization extends Model implements HasPermissionContract
@@ -22,6 +23,7 @@ class Organization extends Model implements HasPermissionContract
     use HasPrefixedId;
     use HasSystemAsCreator;
     use ModelExtension;
+    use SoftDeletes;
 
     protected $table = 'organizations';
 

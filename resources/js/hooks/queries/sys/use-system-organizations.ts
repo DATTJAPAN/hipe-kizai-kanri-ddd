@@ -3,7 +3,7 @@ import axios from 'axios';
 
 function useGetAllOrganizations(queryKey?: string[]) {
     const QUERY_KEY = ['orgs', 'datatables'];
-    const QUERY_URL = route('v1.req.sys.orgs.get_all:post');
+    const QUERY_URL = route('v1.req.sys.orgs.datatable:post');
     const QUERY_DATA = {};
     const QUERY_HEADERS = {
         headers: {
