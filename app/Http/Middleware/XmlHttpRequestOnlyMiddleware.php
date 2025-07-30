@@ -12,7 +12,7 @@ class XmlHttpRequestOnlyMiddleware
     public function handle(Request $request, Closure $next)
     {
         if (! $request->ajax()) {
-            abort(403, 'This action is not allowed.');
+            abort(403, 'Ajax only.');
         }
 
         return $next($request);

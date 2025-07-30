@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domains\Organization\Tags;
 
+use App\Domains\Organization\Organizations\HasOrganization;
 use App\Domains\Organization\Users\HasOrganizationCreator;
-use App\Domains\Shared\Domains\Organizations\HasOrganization;
 use App\Support\Traits\Model\ModelExtension;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\PrefixedIds\Models\Concerns\HasPrefixedId;

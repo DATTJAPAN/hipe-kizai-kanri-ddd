@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domains\Shared\Domains\Organizations;
+namespace App\Domains\Organization\Organizations;
 
 use App\Domains\Organization\Users\OrganizationUser;
+use App\Domains\Shared\Models\Organization;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 trait HasOrganization

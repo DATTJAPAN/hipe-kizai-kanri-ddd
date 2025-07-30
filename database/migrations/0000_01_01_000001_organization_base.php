@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('business_email')->unique()->nullable();
             $table->string('domain')->unique()->nullable();
             $table->json('alt_domains')->nullable();
-            $table->foreignId('creator_id')
+            $table->foreignId('creator_sys_user_id')
                 ->index()
                 ->nullable()
                 ->constrained(
@@ -43,9 +43,10 @@ return new class extends Migration
             $table->id();
             $table->string('prefixed_id')->nullable()->unique();
             // --------------
-            $table->string('username')->nullable();
+            $table->string('username')->unique()->nullable();
             $table->string('email')->unique()->nullable();
             $table->string('password')->nullable();
+            $table->boolean('is_permanent')->default(false);
             $table->rememberToken();
             // --------------
             $table->foreignId('org_id')

@@ -32,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     // --> additional middleware can be added
                     require_once base_path('routes/v1/auth.php');
                     require_once base_path('routes/v1/page.php');
+                    require_once base_path('routes/v1/handler.php');
                 });
         }
     )

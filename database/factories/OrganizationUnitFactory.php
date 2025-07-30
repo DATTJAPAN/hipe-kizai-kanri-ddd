@@ -7,7 +7,7 @@ namespace Database\Factories;
 use App\Domains\Organization\Units\OrganizationUnit;
 use App\Domains\Organization\Units\OrganizationUnitType;
 use App\Domains\Organization\Users\OrganizationUser;
-use App\Domains\Shared\Domains\Organizations\Organization;
+use App\Domains\Shared\Models\Organization;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 

@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Domains\Organization\Organization\OrganizationController;
+use App\Domains\Organization\Organizations\OrganizationController;
+use App\Domains\System\Organizations\OrganizationController as SystemOrganizationController;
 use App\Domains\System\System\SystemController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -23,4 +24,12 @@ Route::middleware(['auth:system', 'auth'])
     ->name('sys.')
     ->group(function () {
         Route::get('/', [SystemController::class, 'dashboard'])->name('dashboard:get');
+
+        // sys/orgs/**/*
+        Route::prefix('orgs')
+            ->name('orgs.')
+            ->group(function () {
+                Route::get('/', [SystemOrganizationController::class, 'dashboard'])->name('dashboard:get');
+                Route::get('/manage/{prefixedId?}', [SystemOrganizationController::class, 'manage'])->name('manage:get');
+            });
     });

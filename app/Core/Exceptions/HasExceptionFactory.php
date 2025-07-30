@@ -8,13 +8,33 @@ use Throwable;
 
 trait HasExceptionFactory
 {
+    protected string $targetClass;
+
+    private static string $factoryDefaultMessage = 'An error occurred';
+
+    private static string $factoryCreateFailedMessage = 'Creation failed';
+
+    private static string $factoryUpdateFailedMessage = 'Update failed';
+
+    private static string $factoryDeleteFailedMessage = 'Deletion failed';
+
+    private static string $factoryNotFoundMessage = 'Resource not found';
+
+    private static string $factoryInvalidDataMessage = 'Invalid data provided';
+
+    private static string $factoryUnexpectedErrorMessage = 'An unexpected error occurred';
+
+    private static string $factoryDuplicateMessage = 'Resource already exists';
+
     public function __construct(
         string $message = '',
         ?int $code = 0,
         ?Throwable $previous = null
     ) {
+        $this->targetClass = static::getDefaultTargetClass();
+
         parent::__construct(
-            $message ?: (static::$defaultMessage ?? 'An error occurred'),
+            $message ?: ($this->targetClass.': '.static::$factoryDefaultMessage),
             $code,
             $previous
         );
@@ -23,14 +43,15 @@ trait HasExceptionFactory
     public static function createFailed(?string $details = null): self
     {
         return new self(
-            self::formatMessage(static::$createFailedMessage ?? 'Creation failed', $details)
+            self::formatMessage(static::$factoryCreateFailedMessage, $details),
+            422
         );
     }
 
     public static function updateFailed(?string $details = null): self
     {
         return new self(
-            self::formatMessage(static::$updateFailedMessage ?? 'Update failed', $details),
+            self::formatMessage(static::$factoryUpdateFailedMessage, $details),
             422
         );
     }
@@ -38,15 +59,15 @@ trait HasExceptionFactory
     public static function deleteFailed(?string $details = null): self
     {
         return new self(
-            self::formatMessage(static::$deleteFailedMessage ?? 'Deletion failed', $details),
+            self::formatMessage(static::$factoryDeleteFailedMessage, $details),
             422
         );
     }
 
-    public static function notFound(int $id): self
+    public static function notFound(string|int $id): self
     {
         return new self(
-            (static::$notFoundMessage ?? 'Resource not found')." ID: {$id}",
+            static::getDefaultTargetClass().': '.static::$factoryNotFoundMessage." (ID: {$id})",
             404
         );
     }
@@ -54,7 +75,7 @@ trait HasExceptionFactory
     public static function invalidData(?string $details = null): self
     {
         return new self(
-            self::formatMessage(static::$invalidDataMessage ?? 'Invalid data provided', $details),
+            self::formatMessage(static::$factoryInvalidDataMessage, $details),
             422
         );
     }
@@ -62,13 +83,30 @@ trait HasExceptionFactory
     public static function unexpected(?string $details = null): self
     {
         return new self(
-            self::formatMessage(static::$unexpectedErrorMessage ?? 'An unexpected error occurred', $details),
+            self::formatMessage(static::$factoryUnexpectedErrorMessage, $details),
             500
         );
     }
 
+    public static function duplicate(?string $details = null): self
+    {
+        return new self(
+            self::formatMessage(static::$factoryDuplicateMessage, $details),
+            409
+        );
+    }
+
+    protected static function getDefaultTargetClass(): string
+    {
+        // Extract class name without namespace
+        return class_basename(static::class);
+    }
+
     protected static function formatMessage(string $message, ?string $details = null): string
     {
-        return $details ? "{$message} Details: {$details}" : $message;
+        $prefix = static::getDefaultTargetClass();
+        $baseMessage = "{$prefix}: {$message}";
+
+        return $details ? "{$baseMessage}. Details: {$details}" : $baseMessage;
     }
 }

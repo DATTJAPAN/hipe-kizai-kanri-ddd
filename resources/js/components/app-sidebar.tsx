@@ -2,18 +2,13 @@ import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { getSidebarNavigation } from '@/configs/navigation';
+import { type NavItem, type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { BookOpen, Folder } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '#',
-        icon: LayoutGrid,
-    },
-];
+let mainNavItems: NavItem[] = getSidebarNavigation(); // init to empty
 
 const footerNavItems: NavItem[] = [
     {
@@ -29,6 +24,10 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    // Use the scope to get the active guard
+    const { scope } = usePage<SharedData>().props;
+    mainNavItems = getSidebarNavigation(scope); // override the default
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>

@@ -1,4 +1,4 @@
-import { AppEnvironment, AuthScope, GuardScope } from '@/types/app';
+import { AppEnvironment, AuthScope, FormContext, GuardScope } from '@/types/app';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
@@ -31,7 +31,7 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
-    context: string | (Record<string, unknown> & AuthScope) | undefined;
+    context: (Record<string, unknown> & AuthScope & FormContext) | undefined;
 
     [key: string]: unknown;
 }

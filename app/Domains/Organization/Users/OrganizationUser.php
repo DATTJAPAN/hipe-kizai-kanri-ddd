@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domains\Organization\Users;
 
-use App\Domains\Shared\Domains\Organizations\Organization;
+use App\Domains\Organization\Organizations\HasOrganization;
+use App\Domains\Shared\Models\Organization;
 use App\Support\Traits\Model\HasSettingsTrait;
 use App\Support\Traits\Model\ModelExtension;
 use Database\Factories\OrganizationUserFactory;
@@ -14,6 +15,7 @@ use Spatie\PrefixedIds\Models\Concerns\HasPrefixedId;
 
 class OrganizationUser extends Authenticatable
 {
+    use HasOrganization;
     use HasPrefixedId;
     use HasSettingsTrait;
     use ModelExtension;
@@ -24,6 +26,7 @@ class OrganizationUser extends Authenticatable
         'email',
         'username',
         'password',
+        'is_permanent',
         'org_id',
     ];
 
@@ -43,11 +46,22 @@ class OrganizationUser extends Authenticatable
         string $username = 'super',
         string $password = 'password'
     ): void {
+        $username = str($username)
+            ->lower()
+            ->toString().'_'.str()->random(10);
+
         (new self)::create([
             'org_id' => $organization->id,
-            'email' => sprintf('%s@%s', str($username)->lower()->toString(), str($organization->business_email)->lower()->afterLast('@')->trim()->toString()),
+            'email' => sprintf('%s@%s', $username,
+                str($organization->business_email)
+                    ->lower()
+                    ->afterLast('@')
+                    ->trim()
+                    ->toString()
+            ),
             'username' => $username,
             'password' => $password,
+            'is_permanent' => true,
         ]);
     }
 

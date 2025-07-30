@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->rememberToken();
             // --------------
-            $table->foreignId('creator_id')
+            $table->foreignId('creator_sys_user_id')
                 ->index()
                 ->nullable()
                 ->constrained(

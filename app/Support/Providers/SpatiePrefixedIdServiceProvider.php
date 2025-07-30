@@ -10,7 +10,7 @@ use App\Domains\Organization\Units\OrganizationUnit;
 use App\Domains\Organization\Users\OrganizationUser;
 use App\Domains\Shared\Domains\Authorization\Permission;
 use App\Domains\Shared\Domains\Authorization\Role;
-use App\Domains\Shared\Domains\Organizations\Organization;
+use App\Domains\Shared\Models\Organization;
 use App\Domains\System\Users\SystemUser;
 use Illuminate\Support\ServiceProvider;
 use Spatie\PrefixedIds\PrefixedIds;
