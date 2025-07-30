@@ -3,16 +3,16 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getDefaultMRTOptions } from '@/configs/datatables';
-import { getOrganizationColumns } from '@/definitions/columns';
-import { useGetAllOrganizations } from '@/hooks/queries/sys';
+import { getOrganizationUnitColumns } from '@/definitions/columns';
+import { useGetAllOrganizationUnits } from '@/hooks/queries/orgs';
 import { cn } from '@/lib/utils';
-import { Organization } from '@/types/schema/organization';
+import { OrganizationUnit } from '@/types/schema';
 import { Link } from '@inertiajs/react';
 import { AlertTriangle, Archive, RefreshCw, SquarePen, Trash2 } from 'lucide-react';
 import { MantineReactTable, type MRT_ColumnDef, useMantineReactTable } from 'mantine-react-table';
 import { useMemo, useState } from 'react';
 
-export default function SysOrgDashboardDataTable() {
+export default function OrgUnitDashboardDataTable() {
     const [showOnlyTrashed, setShowOnlyTrashed] = useState(false);
     const [showWithTrashed, setShowWithTrashed] = useState(false);
 
@@ -22,14 +22,14 @@ export default function SysOrgDashboardDataTable() {
         error,
         data = [],
         refetch,
-    } = useGetAllOrganizations({
+    } = useGetAllOrganizationUnits({
         onlyTrashed: showOnlyTrashed,
         withTrashed: showWithTrashed && !showOnlyTrashed,
     });
 
-    const columns = useMemo<MRT_ColumnDef<Organization>[]>(() => getOrganizationColumns, []);
+    const columns = useMemo<MRT_ColumnDef<OrganizationUnit>[]>(() => getOrganizationUnitColumns, []);
 
-    const defaultMRTOptions = getDefaultMRTOptions<Organization>();
+    const defaultMRTOptions = getDefaultMRTOptions<OrganizationUnit>();
 
     const handleToggleOnlyTrashed = () => {
         setShowOnlyTrashed(!showOnlyTrashed);
@@ -61,7 +61,7 @@ export default function SysOrgDashboardDataTable() {
         return baseUrl;
     };
 
-    const table = useMantineReactTable<Organization>({
+    const table = useMantineReactTable<OrganizationUnit>({
         ...defaultMRTOptions,
         columns,
         data,

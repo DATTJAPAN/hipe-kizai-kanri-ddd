@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Shared\Domains\Authorization;
 
-use App\Domains\Shared\Domains\Organizations\Organization;
+use App\Domains\Shared\Models\Organization;
 
 class RoleBuilder
 {

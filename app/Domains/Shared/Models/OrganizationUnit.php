@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Domains\Organization\Units;
+namespace App\Domains\Shared\Models;
 
 use App\Domains\Organization\Organizations\HasOrganization;
+use App\Domains\Organization\Units\OrganizationUnitType;
 use App\Domains\Organization\Users\OrganizationUser;
 use App\Support\Traits\Model\ModelExtension;
 use Database\Factories\OrganizationUnitFactory;

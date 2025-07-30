@@ -1,8 +1,8 @@
-import { type QueryOptions } from '@/hooks/queries/type';
+import { QueryOptions } from '@/hooks/queries/type';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-function useGetAllOrganizations(options: QueryOptions = {}) {
+function useGetAllOrganizationUnits(options: QueryOptions = {}) {
     const { queryKey, url, withTrashed = false, onlyTrashed = false, additionalData = {} } = options;
 
     const QUERY_KEY: string[] = queryKey || [
@@ -12,7 +12,7 @@ function useGetAllOrganizations(options: QueryOptions = {}) {
         ...(onlyTrashed ? ['only-trashed'] : []),
     ];
 
-    const QUERY_URL: string = url || route('v1.req.sys.orgs.datatable:post');
+    const QUERY_URL: string = url || route('v1.req.org.units.datatable:post');
 
     const QUERY_DATA = {
         withTrashed,
@@ -35,4 +35,4 @@ function useGetAllOrganizations(options: QueryOptions = {}) {
     });
 }
 
-export { useGetAllOrganizations };
+export { useGetAllOrganizationUnits };

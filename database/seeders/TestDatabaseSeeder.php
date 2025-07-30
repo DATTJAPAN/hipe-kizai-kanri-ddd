@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Domains\Organization\Units\OrganizationUnit;
 use App\Domains\Shared\Models\Organization;
+use App\Domains\Shared\Models\OrganizationUnit;
 use App\Domains\System\Users\SystemUser;
 use Artisan;
 use Illuminate\Database\Seeder;

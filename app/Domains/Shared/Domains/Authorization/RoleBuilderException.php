@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Domains\Shared\Domains\Authorization;
 
-use App\Core\Exceptions\HasExceptionFactory;
+use App\Core\Exceptions\HasCrudExceptionFactory;
 use Exception;
 
 class RoleBuilderException extends Exception
 {
-    use HasExceptionFactory;
+    use HasCrudExceptionFactory;
 
     protected static string $defaultMessage = 'Role Builder Exception';
 }

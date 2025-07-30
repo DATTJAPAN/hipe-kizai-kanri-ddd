@@ -1,4 +1,5 @@
 'use client';
+import CustomizableCombobox from '@/components/comboboxes/customizable-combobox';
 import ConfirmDialog from '@/components/dialogs/confirm-dialog';
 import InputCounter from '@/components/inputs/input-counter';
 import FormLabelConditional from '@/components/labels/form-label-conditional';
@@ -6,19 +7,24 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useFormControlFlags } from '@/hooks/forms/computed/use-form-control-flags';
+import { useFormDataStateFlags } from '@/hooks/forms/computed/use-form-data-state-flags';
+import { useFormModeFlags } from '@/hooks/forms/computed/use-form-mode-flags';
 import { FormMode } from '@/types/app';
+import { OrganizationUnitEnum, orgUnitTypeOptions, orgUnitTypes } from '@/types/enums/organization_unit_enum';
 import {
-    organizationCharacterLimits,
-    OrganizationCreateType,
-    organizationPartialSchema,
-    organizationSchema,
-    OrganizationUpdateType,
+    organizationUnitCharacterLimits,
+    OrganizationUnitCreateType,
+    organizationUnitPartialSchema,
+    organizationUnitSchema,
+    OrganizationUnitUpdateType,
 } from '@/types/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from '@inertiajs/react';
-import { AlertCircleIcon, LinkIcon, Loader2, Plus, Trash2 } from 'lucide-react';
+import { AlertCircleIcon, Loader2, Plus, Trash2 } from 'lucide-react';
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { SubmitErrorHandler, useFieldArray, useForm } from 'react-hook-form';
+import { SubmitErrorHandler, useForm } from 'react-hook-form';
 
 type FormProps = {
     mode: FormMode;
@@ -29,57 +35,26 @@ type FormProps = {
 
 type ConfirmActionType = 'delete' | 'deactivate' | 'restore';
 
-export default function SysOrgManageForm({ mode, formKey, formData, onFormStateChange }: FormProps) {
+export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormStateChange }: FormProps) {
     // ============ STATE MANAGEMENT ============
     const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
-    const [syncDomainWithEmail, setSyncDomainWithEmail] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isConfirmAlertOpen, setIsConfirmAlertOpen] = useState(false);
     const [confirmActionType, setConfirmActionType] = useState<ConfirmActionType>('delete');
 
     // ============ CONSTANTS & COMPUTED VALUES ============
-    const charLimits = useMemo(() => organizationCharacterLimits, []);
+    const charLimits = useMemo(() => organizationUnitCharacterLimits, []);
 
-    const defaultValues: OrganizationCreateType | OrganizationUpdateType = useMemo(
-        () => ({
-            name: '',
-            business_email: '',
-            domain: '',
-            alt_domains: [] as string[],
-        }),
-        [],
-    );
+    const defaultValues = useMemo(() => ({}), []);
 
     // Form mode flags
-    const formModeFlags = useMemo(
-        () => ({
-            isCreateMode: mode === 'create',
-            isManageMode: mode === 'manage',
-            isEditOrManageMode: mode === 'edit' || mode === 'manage',
-            hasData: formData !== null && formData !== undefined && Object.keys(formData).length > 0,
-        }),
-        [mode, formData],
-    );
+    const formModeFlags = useFormModeFlags({ mode, formData });
 
     // Data state flags
-    const dataStateFlags = useMemo(() => {
-        const usesSoftDelete: boolean = formModeFlags.hasData && formData !== undefined && Object.hasOwn(formData, 'deleted_at');
-        return {
-            usesSoftDelete,
-            isCurrentlyActive: usesSoftDelete && formData?.deleted_at === null,
-            isCurrentlyInactive: usesSoftDelete && formData?.deleted_at !== null,
-        };
-    }, [formModeFlags.hasData, formData]);
+    const dataStateFlags = useFormDataStateFlags({ hasData: formModeFlags.hasData, formData });
 
     // Control flags
-    const controlFlags = useMemo(
-        () => ({
-            disableForm: mode === 'unknown' || dataStateFlags.isCurrentlyInactive,
-            disableActionButtons: mode === 'unknown',
-            disableFormSubmit: mode === 'unknown' || dataStateFlags.isCurrentlyInactive,
-        }),
-        [mode, dataStateFlags.isCurrentlyInactive],
-    );
+    const controlFlags = useFormControlFlags({ mode, isCurrentlyInactive: dataStateFlags.isCurrentlyInactive });
 
     // Route params
     const routeParams = useMemo(() => {
@@ -97,19 +72,16 @@ export default function SysOrgManageForm({ mode, formKey, formData, onFormStateC
         [formModeFlags.isEditOrManageMode, defaultValues, formData],
     );
 
-    const form = useForm<OrganizationCreateType | OrganizationUpdateType>({
+    const form = useForm<OrganizationUnitCreateType | OrganizationUnitUpdateType>({
         disabled: controlFlags.disableForm,
-        resolver: zodResolver(formModeFlags.isEditOrManageMode ? organizationPartialSchema : organizationSchema),
+        resolver: zodResolver(formModeFlags.isEditOrManageMode ? organizationUnitPartialSchema : organizationUnitSchema),
         defaultValues: resolvedDefaultValues,
     });
 
-    const { watch, setValue, formState } = form;
-    const { fields, append, remove } = useFieldArray({
-        name: 'alt_domains' as keyof (OrganizationCreateType | OrganizationUpdateType),
-        control: form.control,
-    });
+    const { formState, setValue } = form;
 
     // ============ EFFECTS ============
+
     // Form dirty state listener
     useEffect(() => {
         if (onFormStateChange) {
@@ -117,24 +89,10 @@ export default function SysOrgManageForm({ mode, formKey, formData, onFormStateC
         }
     }, [formState?.isDirty, mode, onFormStateChange]);
 
-    // Domain sync effect
-    const businessEmail = watch('business_email');
-    useEffect(() => {
-        if (syncDomainWithEmail && businessEmail && typeof businessEmail === 'string' && !controlFlags.disableForm) {
-            const extracted = businessEmail.split('@')[1] || '';
-            if (extracted) {
-                setValue('domain', extracted);
-            }
-        }
-    }, [businessEmail, setValue, syncDomainWithEmail, controlFlags.disableForm]);
-
     // ============ EVENT HANDLERS ============
-    const toggleDomainSync = useCallback(() => {
-        setSyncDomainWithEmail((prev) => !prev);
-    }, []);
 
     const handleValidSubmit = useCallback(
-        (data: OrganizationUpdateType | OrganizationCreateType) => {
+        (data: OrganizationUnitCreateType | OrganizationUnitUpdateType) => {
             console.log('Form submitted with data:', data);
             setIsSubmitting(true);
 
@@ -167,7 +125,7 @@ export default function SysOrgManageForm({ mode, formKey, formData, onFormStateC
         [formModeFlags.isEditOrManageMode, form, routeParams.modelIdentifier, routeParams.prefixedId],
     );
 
-    const handleInvalidSubmit: SubmitErrorHandler<OrganizationCreateType | OrganizationUpdateType> = useCallback((errors) => {
+    const handleInvalidSubmit: SubmitErrorHandler<OrganizationUnitCreateType | OrganizationUnitUpdateType> = useCallback((errors) => {
         console.error('Form submission errors:', errors);
     }, []);
 
@@ -261,127 +219,91 @@ export default function SysOrgManageForm({ mode, formKey, formData, onFormStateC
                         render={({ field }) => (
                             <FormItem className="max-w-2xl">
                                 <FormLabelConditional required>
-                                    <FormLabel>Name</FormLabel>
+                                    <FormLabel>Unit Name</FormLabel>
                                 </FormLabelConditional>
                                 <InputCounter maxLength={charLimits.name} value={field.value ?? ''}>
                                     <FormControl>
-                                        <Input placeholder="Organization Name" maxLength={charLimits.name} {...field} value={field.value ?? ''} />
+                                        <Input placeholder="ex. AI Division " maxLength={charLimits.name} {...field} value={field.value ?? ''} />
                                     </FormControl>
                                 </InputCounter>
-                                <FormDescription>This is your organization's display name.</FormDescription>
+                                <FormDescription>This is your organization's unit display name.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
 
-                    {/* Business Email Field */}
+                    {/* Code Field */}
                     <FormField
                         control={form.control}
-                        name="business_email"
+                        name="code"
                         render={({ field }) => (
                             <FormItem className="max-w-2xl">
                                 <FormLabelConditional required>
-                                    <FormLabel>Business Email</FormLabel>
+                                    <FormLabel>Unit Code</FormLabel>
                                 </FormLabelConditional>
-                                <InputCounter maxLength={charLimits.email} value={field.value ?? ''}>
+                                <InputCounter maxLength={charLimits.code} value={field.value ?? ''}>
                                     <FormControl>
-                                        <Input placeholder="contact@example.com" maxLength={charLimits.email} {...field} value={field.value ?? ''} />
+                                        <Input placeholder="ex. AIDIV001" maxLength={charLimits.code} {...field} value={field.value ?? ''} />
                                     </FormControl>
                                 </InputCounter>
-                                <FormDescription>Primary email for your organization.</FormDescription>
+                                <FormDescription>This is your organization's unit unique code.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
 
-                    {/* Domain Field */}
+                    {/* Unit Type */}
                     <FormField
                         control={form.control}
-                        name="domain"
+                        name="type"
                         render={({ field }) => (
                             <FormItem className="max-w-2xl">
                                 <FormLabelConditional required>
-                                    <FormLabel>Domain</FormLabel>
+                                    <FormLabel>Unit Type</FormLabel>
                                 </FormLabelConditional>
-                                <div className="flex items-start gap-2">
-                                    <InputCounter maxLength={charLimits.domain} value={field.value ?? ''}>
-                                        <FormControl>
-                                            <Input placeholder="example.com" maxLength={charLimits.domain} {...field} value={field.value ?? ''} />
-                                        </FormControl>
-                                    </InputCounter>
-                                    <Button
-                                        type="button"
-                                        variant={syncDomainWithEmail ? 'secondary' : 'ghost'}
-                                        size="icon"
-                                        className="cursor-pointer"
-                                        onClick={toggleDomainSync}
-                                        disabled={controlFlags.disableForm || isSubmitting}
-                                        title={syncDomainWithEmail ? 'Auto-sync enabled' : 'Auto-sync disabled'}
-                                    >
-                                        <LinkIcon className={`h-4 w-4 ${syncDomainWithEmail ? 'text-foreground' : 'text-muted-foreground'}`} />
-                                    </Button>
-                                </div>
-                                <FormDescription>
-                                    Main domain used for company email.
-                                    {syncDomainWithEmail ? ' Auto-syncs with business email domain.' : ' Auto-sync disabled.'}
-                                </FormDescription>
+                                <FormControl>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a unit type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {orgUnitTypes.map(({ value, label, icon: Icon, color }) => (
+                                                <SelectItem key={value} value={value} className={`flex items-center gap-2 ${color}`}>
+                                                    <Icon className="h-4 w-4" />
+                                                    {label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormDescription>This defines the structural category of the organization unit.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
 
-                    {/* Alternative Domains */}
-                    <div className="max-w-2xl space-y-3">
-                        <FormLabel>Alternative Domains</FormLabel>
-                        <div className="mt-3 space-y-2">
-                            {fields.map((field, index) => (
-                                <div key={field.id} className="flex items-start gap-2">
-                                    <FormField
-                                        control={form.control}
-                                        name={`alt_domains.${index}` as const}
-                                        render={({ field }) => (
-                                            <FormItem className="flex-1">
-                                                <InputCounter maxLength={charLimits.domain} value={field.value ?? ''}>
-                                                    <FormControl>
-                                                        <Input
-                                                            placeholder={`alt-${index + 1}.example.com`}
-                                                            maxLength={charLimits.domain}
-                                                            {...field}
-                                                            value={field.value ?? ''}
-                                                        />
-                                                    </FormControl>
-                                                </InputCounter>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="cursor-pointer"
-                                        onClick={() => remove(index)}
-                                        disabled={isSubmitting || controlFlags.disableForm}
-                                    >
-                                        <Trash2 className="h-4 w-4 text-muted-foreground" />
-                                    </Button>
-                                </div>
-                            ))}
-                        </div>
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            className="cursor-pointer"
-                            onClick={() => append('')}
-                            disabled={fields.length >= 5 || isSubmitting || controlFlags.disableForm}
-                        >
-                            <Plus className="h-4 w-4" />
-                            <span className="text-sm">Domain</span>
-                        </Button>
-                        <FormDescription>You may add up to 5 unique domains.</FormDescription>
-                        <FormMessage>{form?.formState?.errors?.alt_domains?.root?.message}</FormMessage>
-                    </div>
+                    {/* Unit Type */}
+                    <FormField
+                        control={form.control}
+                        name="type"
+                        render={({ field }) => (
+                            <FormItem className="max-w-2xl">
+                                <FormLabelConditional required>
+                                    <FormLabel>Unit Type</FormLabel>
+                                </FormLabelConditional>
+                                <CustomizableCombobox
+                                    currentValue={field.value}
+                                    initialValue={field.value}
+                                    staticOptions={orgUnitTypeOptions}
+                                    onChange={(value) => {
+                                        setValue('type', value as OrganizationUnitEnum);
+                                    }}
+                                />
+                                <FormDescription>This defines the structural category of the organization unit.</FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
                     {/* Submit Button */}
                     {(formModeFlags.isCreateMode || dataStateFlags.isCurrentlyActive) && (

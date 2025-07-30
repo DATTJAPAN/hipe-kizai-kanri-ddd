@@ -6,7 +6,7 @@ namespace App\Core\Exceptions;
 
 use Throwable;
 
-trait HasExceptionFactory
+trait HasCrudExceptionFactory
 {
     protected string $targetClass;
 

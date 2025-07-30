@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use App\Domains\Organization\Users\OrganizationUser;
-use App\Domains\Shared\Domains\Organizations\Organization;
+use App\Domains\Shared\Models\Organization;
 use App\Domains\System\Users\SystemUser;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 

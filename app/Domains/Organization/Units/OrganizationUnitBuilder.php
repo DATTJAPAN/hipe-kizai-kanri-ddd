@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Domains\Organization\Units;
 
 use App\Domains\Organization\Users\OrganizationUser;
-use App\Domains\Shared\Domains\Organizations\Organization;
+use App\Domains\Shared\Models\Organization;
+use App\Domains\Shared\Models\OrganizationUnit;
 
 class OrganizationUnitBuilder
 {

@@ -12,14 +12,13 @@ enum OrganizationUnitType
 {
     use From, Options, Values;
 
-    // Divider
     case DIVISION;
+
+    case DEPARTMENT;
     case BRANCH;
     case SECTION;
     case UNIT;
 
-    // Divider
-    case DEPARTMENT;
     case TEAM;
 
     public function label(): string
