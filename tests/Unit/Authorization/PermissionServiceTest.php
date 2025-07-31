@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Authorization;
 
-use App\Domains\Shared\Domains\Authorization\PermissionException;
-use App\Domains\Shared\Domains\Authorization\PermissionService;
+use App\Domains\Shared\Authorization\PermissionException;
+use App\Domains\Shared\Authorization\PermissionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

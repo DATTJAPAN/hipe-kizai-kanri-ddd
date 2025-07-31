@@ -17,7 +17,7 @@ class OrganizationUnitService extends BaseService
             exceptionClass: OrganizationUnitException::class,
         );
 
-        // Tap on query to always get only organization related data
+        // Tap on the query to always get only organization-related data
         $this->repository->tapQueryAlways(
             fn ($query) => $query->where('org_id', activeUser()->org_id)
         );

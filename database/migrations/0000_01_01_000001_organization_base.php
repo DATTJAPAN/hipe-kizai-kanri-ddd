@@ -181,7 +181,7 @@ return new class extends Migration
             $table->string('prefixed_id')->nullable()->unique();
             // --------------
             $table->string('name');
-            $table->string('code')->unique()->nullable();
+            $table->string('code')->nullable();
             // --------------
             $table->foreignId('org_id')
                 ->index()

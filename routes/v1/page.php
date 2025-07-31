@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Domains\Organization\Organizations\OrganizationController;
-use App\Domains\Organization\Units\OrganizationUnitController;
-use App\Domains\System\Organizations\OrganizationController as SystemOrganizationController;
-use App\Domains\System\System\SystemController;
+use App\Http\Controllers\Organization\OrganizationController;
+use App\Http\Controllers\Organization\OrganizationUnitController;
+use App\Http\Controllers\System\OrganizationController as SystemOrganizationController;
+use App\Http\Controllers\System\SystemController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 

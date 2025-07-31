@@ -10,7 +10,7 @@ trait HasOrganizationUserAsCreator
 
     public static function bootHasOrganizationUserAsCreator(): void
     {
-        static::creating(function ($model) {
+        static::creating(static function ($model) {
             $auth = auth()->guard(name: activeGuard());
             $authUser = $auth->check() ? $auth->user() : null;
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Domains\Organization\Organizations\OrganizationController;
-use App\Domains\Organization\Units\OrganizationUnitController;
-use App\Domains\System\Organizations\OrganizationController as SystemOrganizationController;
+use App\Http\Controllers\Organization\OrganizationController;
+use App\Http\Controllers\Organization\OrganizationUnitController;
+use App\Http\Controllers\System\OrganizationController as SystemOrganizationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -23,8 +23,7 @@ Route::middleware(['auth:web', 'auth'])
             ->group(function () {
                 Route::post('add', [OrganizationUnitController::class, 'addHandler'])->name('add:post');
                 Route::put('/update/{prefixedId}', [OrganizationUnitController::class, 'updateHandler'])->name('update:put');
-                Route::delete('/delete/{prefixedId}', [OrganizationUnitController::class, 'softDeleteHandler'])->name('delete:delete');
-                Route::patch('/restore/{prefixedId}', [OrganizationUnitController::class, 'restoreHandler'])->name('restore:patch');
+                Route::delete('/delete/{prefixedId}', [OrganizationUnitController::class, 'forceDeleteHandler'])->name('delete:delete');
             });
     });
 

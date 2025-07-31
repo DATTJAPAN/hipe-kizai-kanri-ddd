@@ -58,7 +58,7 @@ class OrganizationFormData extends Data
                             ->orWhereJsonContains('alt_domains', $value); // Check against alt domains
                     });
 
-                    // If we have an ID (update operation), exclude current record
+                    // If we have an ID (update operation), exclude the current record
                     if (request()->route('prefixedId')) {
                         $query->where('prefixed_id', '!=', request()->route('prefixedId'));
                     }

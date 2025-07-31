@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import OrgUnitManageUnitForm from '@/pages/v1/org/unit/_form';
 import { type BreadcrumbItem, SharedData } from '@/types';
 import { FormMode } from '@/types/app';
+import { OrganizationUnit } from '@/types/schema';
 import { Head, usePage } from '@inertiajs/react';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -89,7 +90,7 @@ export default function OrgUnitManageUnit() {
                 <OrgUnitManageUnitForm
                     mode={formState.mode}
                     formKey={formMode?.key}
-                    formData={formMode?.data}
+                    formData={formMode?.data as OrganizationUnit}
                     onFormStateChange={handleFormStateChange}
                 />
 

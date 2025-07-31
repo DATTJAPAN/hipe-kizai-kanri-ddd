@@ -1,5 +1,5 @@
 import { characterLimitForArray } from '@/configs/inputs';
-import { OrganizationUnitEnum, type OrganizationUnitType } from '@/types/enums/organization_unit_enum';
+import { OrganizationUnitEnum } from '@/types/enums/organization_unit_enum';
 import { z } from 'zod';
 import type { CreatorOrgUserId, HeadOrgId, IdAndPrefixedId, ParentUnitId } from './default';
 
@@ -9,14 +9,15 @@ import type { CreatorOrgUserId, HeadOrgId, IdAndPrefixedId, ParentUnitId } from 
 export type OrganizationUnit = IdAndPrefixedId & {
     name: string;
     code: string;
-    type: OrganizationUnitType;
+    type: OrganizationUnitEnum;
     description: string;
-    hierarchy: number;
-    is_strict_hierarchy: boolean;
-    is_active: boolean;
-    parent_unit_id: ParentUnitId;
-    head_org_user_id: HeadOrgId;
-    creator_org_user_id: CreatorOrgUserId;
+    hierarchy?: number;
+    is_strict_hierarchy?: boolean;
+    is_active?: boolean;
+    parent_unit_id?: ParentUnitId;
+    head_org_user_id?: HeadOrgId;
+    creator_org_user_id?: CreatorOrgUserId;
+    parent_unit?: OrganizationUnit | null;
 };
 
 // =======================

@@ -11,7 +11,7 @@ export default function ServerErrorAlert({ errors }: ServerErrorAlertProps) {
     return (
         <Alert className="mt-4 bg-muted">
             <AlertCircleIcon className="h-4 w-4 text-red-500 dark:text-red-400" />
-            <AlertTitle className="text-red-500 dark:text-red-400">Submission failed due to validation errors.</AlertTitle>
+            <AlertTitle className="text-red-500 dark:text-red-400">Submission failed due to errors.</AlertTitle>
             <AlertDescription>
                 <ul className="mt-2 list-inside list-disc space-y-1 text-sm">
                     {Object.entries(errors).map(([key, message]) => (

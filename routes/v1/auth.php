@@ -8,8 +8,8 @@ declare(strict_types=1);
  * URL Prefixed: /v1/
  */
 
-use App\Domains\Organization\Auth\OrganizationAuthController;
-use App\Domains\System\Auth\SystemAuthController;
+use App\Http\Controllers\Organization\Auth\OrganizationAuthController;
+use App\Http\Controllers\System\Auth\SystemAuthController;
 
 // Ensure the user is not "authenticated"
 Route::middleware('guest')->group(function () {

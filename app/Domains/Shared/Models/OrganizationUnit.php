@@ -83,14 +83,22 @@ class OrganizationUnit extends Model
         return $this->is_strict_hierarchy;
     }
 
+    // ------------------------------------------------------------------------------
+    // Model Configuration
+    // ------------------------------------------------------------------------------
     protected static function newFactory()
     {
         return OrganizationUnitFactory::new();
     }
 
-    // ------------------------------------------------------------------------------
-    // Model Configure Methods
-    // ------------------------------------------------------------------------------
+    protected static function booted(): void
+    {
+        static::creating(static function (OrganizationUnit $unit) {
+            if ($unit->type && $unit->type instanceof OrganizationUnitType) {
+                $unit->hierarchy = $unit->type->defaultHierarchyLevel();
+            }
+        });
+    }
 
     protected function casts(): array
     {

@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Domains\Organization\Users\OrganizationUser;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 if (! function_exists('getModelForGuard')) {
     function getModelForGuard(string $guard): ?string
     {
-        return App\Domains\Shared\Domains\Authorization\Guard::getModelForGuard($guard);
+        return App\Domains\Shared\Authorization\Guard::getModelForGuard($guard);
     }
 }
 
@@ -30,5 +31,14 @@ if (! function_exists('activeUser')) {
         $auth = auth()->guard(name: activeGuard());
 
         return $auth->check() ? $auth->user() : null;
+    }
+}
+
+if (! function_exists('activeOrganizationUser')) {
+    function activeOrganizationUser(): ?Authenticatable
+    {
+        $activeUser = activeUser();
+
+        return $activeUser instanceof OrganizationUser ? $activeUser : null;
     }
 }

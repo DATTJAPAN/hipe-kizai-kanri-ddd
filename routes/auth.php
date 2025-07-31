@@ -4,7 +4,7 @@ declare(strict_types=1);
 //
 // declare(strict_types=1);
 //
-// use App\Domains\System\Auth\SystemAuthController;
+// use App\Http\Controllers\System\Auth\SystemAuthController;
 // use Illuminate\Support\Facades\Route;
 //
 // Route::middleware('guest')->group(function () {

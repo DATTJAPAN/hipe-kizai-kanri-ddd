@@ -11,9 +11,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { useFormControlFlags } from '@/hooks/forms/computed/use-form-control-flags';
 import { useFormDataStateFlags } from '@/hooks/forms/computed/use-form-data-state-flags';
 import { useFormModeFlags } from '@/hooks/forms/computed/use-form-mode-flags';
-import { FormConfirmActionType, FormMode } from '@/types/app';
+import { FormConfirmActionType, FormProps } from '@/types/app';
 import { orgUnitTypeOptions } from '@/types/enums/organization_unit_enum';
 import {
+    OrganizationUnit,
     organizationUnitCharacterLimits,
     OrganizationUnitCreateType,
     organizationUnitPartialSchema,
@@ -26,16 +27,9 @@ import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { SubmitErrorHandler, useForm } from 'react-hook-form';
 
-type FormProps = {
-    mode: FormMode;
-    formKey?: string | number;
-    formData?: Record<string, unknown>;
-    onFormStateChange?: (isDirty: boolean, mode: FormMode) => void;
-};
-
 type ConfirmActionType = Exclude<FormConfirmActionType, 'create' | 'update'>;
 
-export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormStateChange }: FormProps) {
+export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormStateChange }: FormProps<OrganizationUnit>) {
     // ============ STATE MANAGEMENT ============
     const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,7 +71,14 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
 
     // ============ FORM SETUP ============
     const resolvedDefaultValues = useMemo(
-        () => (formModeFlags.isEditOrManageMode ? { ...defaultValues, ...formData } : defaultValues),
+        () =>
+            formModeFlags.isEditOrManageMode
+                ? {
+                      ...defaultValues,
+                      ...formData,
+                      parent_unit_id: formData?.parent_unit?.id,
+                  }
+                : defaultValues,
         [formModeFlags.isEditOrManageMode, defaultValues, formData],
     );
 
@@ -91,7 +92,7 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
 
     // ============ EFFECTS ============
 
-    // Form dirty state listener
+    // Form : dirty state listener
     useEffect(() => {
         if (onFormStateChange) {
             onFormStateChange(formState?.isDirty, mode);
@@ -123,7 +124,7 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
 
             if (formModeFlags.isEditOrManageMode) {
                 return router.put(
-                    route('v1.org.units.update::put', { prefixedId: routeParams.modelIdentifier ?? routeParams.prefixedId }),
+                    route('v1.org.units.update:put', { prefixedId: routeParams.modelIdentifier ?? routeParams.prefixedId }),
                     data,
                     visitOptions,
                 );
@@ -156,7 +157,7 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
     const handlePermanentDelete = useCallback(() => {
         if (!formModeFlags.isEditOrManageMode) return;
 
-        router.delete(route('v1.sys.orgs.force_delete:delete', routeParams.modelIdentifier ?? routeParams?.prefixedId), {
+        router.delete(route('v1.org.units.delete:delete', routeParams.modelIdentifier ?? routeParams?.prefixedId), {
             onSuccess: () => setServerErrors({}),
             onError: (errors) => {
                 console.error('Error permanent deleting:', errors);
@@ -271,6 +272,7 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
                                     <FormLabel>Unit Type</FormLabel>
                                 </FormLabelConditional>
                                 <CustomizableCombobox
+                                    persistedValue={formData?.type}
                                     selectedValue={field.value}
                                     staticOptions={orgUnitTypeOptions}
                                     disableDeSelectingOption
@@ -288,19 +290,22 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
                         name="parent_unit_id"
                         render={({ field }) => (
                             <FormItem className="max-w-2xl">
-                                <FormLabelConditional required>
+                                <FormLabelConditional>
                                     <FormLabel>Parent Unit</FormLabel>
                                 </FormLabelConditional>
                                 <CustomizableCombobox
+                                    persistedValue={formData?.parent_unit?.id ?? ''}
                                     selectedValue={field.value ?? ''}
-                                    persistedValue={''}
                                     onChange={(value) => {
-                                        const converted = typeof value === 'string' && value.trim() !== '' ? Number(value) : undefined;
+                                        const converted = value?.trim() !== '' ? Number(value) : undefined;
                                         field.onChange(converted);
                                     }}
                                     dataSource={{
                                         queryKeys: ['unit', 'parent'],
                                         endpoint: route('v1.req.org.units.options:post'),
+                                        payload: {
+                                            exclude: { prefixed_id: routeParams?.prefixedId },
+                                        },
                                     }}
                                     labels={{
                                         selectedValuePlaceholder: 'No Parent (Top Level)',

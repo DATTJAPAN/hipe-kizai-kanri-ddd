@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Authorization;
 
-use App\Domains\Shared\Domains\Authorization\RoleBuilder;
-use App\Domains\Shared\Domains\Authorization\RoleBuilderException;
-use App\Domains\Shared\Domains\Authorization\RoleException;
-use App\Domains\Shared\Domains\Authorization\RoleService;
+use App\Domains\Shared\Authorization\RoleBuilder;
+use App\Domains\Shared\Authorization\RoleBuilderException;
+use App\Domains\Shared\Authorization\RoleException;
 use App\Domains\Shared\Domains\Organizations\Organization;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -16,12 +15,12 @@ class RoleServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    private RoleService $service;
+    private \App\Domains\Shared\Authorization\RoleService $service;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new RoleService();
+        $this->service = new \App\Domains\Shared\Authorization\RoleService();
     }
 
     public function test_create_role_successfully(): void

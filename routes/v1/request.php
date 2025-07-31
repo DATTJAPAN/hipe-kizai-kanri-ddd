@@ -9,8 +9,8 @@ declare(strict_types=1);
  */
 
 // Ensure the user is not "authenticated"
-use App\Domains\Organization\Units\OrganizationUnitController;
-use App\Domains\System\Organizations\OrganizationController;
+use App\Http\Controllers\Organization\OrganizationUnitController;
+use App\Http\Controllers\System\OrganizationController;
 
 Route::middleware('guest')->group(function () {});
 
