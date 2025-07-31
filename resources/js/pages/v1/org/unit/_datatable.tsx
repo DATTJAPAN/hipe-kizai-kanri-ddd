@@ -51,7 +51,7 @@ export default function OrgUnitDashboardDataTable() {
 
     // Helper function to generate manage URL with query string
     const getManageUrl = (prefixedId: string, deletedAt?: Date | string | null) => {
-        const baseUrl = route('v1.sys.orgs.manage:get', prefixedId);
+        const baseUrl = route('v1.org.units.manage:get', prefixedId);
 
         // Add a query string if the item is deleted, or we're showing trashed items
         if (deletedAt != null && (showOnlyTrashed || showWithTrashed)) {

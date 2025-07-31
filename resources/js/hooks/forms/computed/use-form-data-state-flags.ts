@@ -42,10 +42,20 @@ export function useFormDataStateFlags<TFormData = Record<string, unknown>>({
         // Use type guard instead of Object.hasOwn to properly handle null
         const usesSoftDelete: boolean = hasData && formData !== undefined && hasSoftDelete(formData);
 
+        if (usesSoftDelete && hasSoftDelete(formData)) {
+            const deletedAt = formData.deleted_at;
+            return {
+                usesSoftDelete: true,
+                isCurrentlyActive: deletedAt === null,
+                isCurrentlyInactive: deletedAt !== null,
+            };
+        }
+
+        // Fallback if soft delete is not used: assume always active
         return {
-            usesSoftDelete,
-            isCurrentlyActive: usesSoftDelete && hasSoftDelete(formData) && formData.deleted_at === null,
-            isCurrentlyInactive: usesSoftDelete && hasSoftDelete(formData) && formData.deleted_at !== null,
+            usesSoftDelete: false,
+            isCurrentlyActive: true,
+            isCurrentlyInactive: false,
         };
     }, [hasData, formData]);
 }

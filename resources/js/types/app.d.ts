@@ -15,3 +15,5 @@ export interface FormContext {
         data?: Record<string, unknown>;
     };
 }
+
+export type FormConfirmActionType = 'create' | 'update' | 'delete' | 'deactivate' | 'restore';

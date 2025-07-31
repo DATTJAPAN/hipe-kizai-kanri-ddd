@@ -1,18 +1,18 @@
 'use client';
+import ServerErrorAlert from '@/components/alerts/server-error-alert';
 import CustomizableCombobox from '@/components/comboboxes/customizable-combobox';
 import ConfirmDialog from '@/components/dialogs/confirm-dialog';
 import InputCounter from '@/components/inputs/input-counter';
 import FormLabelConditional from '@/components/labels/form-label-conditional';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { useFormControlFlags } from '@/hooks/forms/computed/use-form-control-flags';
 import { useFormDataStateFlags } from '@/hooks/forms/computed/use-form-data-state-flags';
 import { useFormModeFlags } from '@/hooks/forms/computed/use-form-mode-flags';
-import { FormMode } from '@/types/app';
-import { OrganizationUnitEnum, orgUnitTypeOptions, orgUnitTypes } from '@/types/enums/organization_unit_enum';
+import { FormConfirmActionType, FormMode } from '@/types/app';
+import { orgUnitTypeOptions } from '@/types/enums/organization_unit_enum';
 import {
     organizationUnitCharacterLimits,
     OrganizationUnitCreateType,
@@ -22,7 +22,7 @@ import {
 } from '@/types/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from '@inertiajs/react';
-import { AlertCircleIcon, Loader2, Plus, Trash2 } from 'lucide-react';
+import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { SubmitErrorHandler, useForm } from 'react-hook-form';
 
@@ -33,7 +33,7 @@ type FormProps = {
     onFormStateChange?: (isDirty: boolean, mode: FormMode) => void;
 };
 
-type ConfirmActionType = 'delete' | 'deactivate' | 'restore';
+type ConfirmActionType = Exclude<FormConfirmActionType, 'create' | 'update'>;
 
 export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormStateChange }: FormProps) {
     // ============ STATE MANAGEMENT ============
@@ -45,7 +45,16 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
     // ============ CONSTANTS & COMPUTED VALUES ============
     const charLimits = useMemo(() => organizationUnitCharacterLimits, []);
 
-    const defaultValues = useMemo(() => ({}), []);
+    const defaultValues: OrganizationUnitCreateType | OrganizationUnitUpdateType = useMemo(
+        () => ({
+            name: '',
+            code: '',
+            description: '',
+            type: undefined,
+            parent_unit_id: undefined,
+        }),
+        [],
+    );
 
     // Form mode flags
     const formModeFlags = useFormModeFlags({ mode, formData });
@@ -55,7 +64,7 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
 
     // Control flags
     const controlFlags = useFormControlFlags({ mode, isCurrentlyInactive: dataStateFlags.isCurrentlyInactive });
-
+    console.log(formModeFlags, dataStateFlags, controlFlags);
     // Route params
     const routeParams = useMemo(() => {
         const { prefixedId } = route().params;
@@ -78,7 +87,7 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
         defaultValues: resolvedDefaultValues,
     });
 
-    const { formState, setValue } = form;
+    const { formState, getValues } = form;
 
     // ============ EFFECTS ============
 
@@ -87,7 +96,7 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
         if (onFormStateChange) {
             onFormStateChange(formState?.isDirty, mode);
         }
-    }, [formState?.isDirty, mode, onFormStateChange]);
+    }, [formState?.isDirty, mode, getValues, onFormStateChange]);
 
     // ============ EVENT HANDLERS ============
 
@@ -96,7 +105,7 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
             console.log('Form submitted with data:', data);
             setIsSubmitting(true);
 
-            const commonCallbacks = {
+            const visitOptions = {
                 onSuccess: () => {
                     setServerErrors({});
                     form.reset(data);
@@ -114,13 +123,13 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
 
             if (formModeFlags.isEditOrManageMode) {
                 return router.put(
-                    route('v1.sys.orgs.update:put', { prefixedId: routeParams.modelIdentifier ?? routeParams.prefixedId }),
+                    route('v1.org.units.update::put', { prefixedId: routeParams.modelIdentifier ?? routeParams.prefixedId }),
                     data,
-                    commonCallbacks,
+                    visitOptions,
                 );
             }
 
-            return router.post(route('v1.sys.orgs.add:post'), data, commonCallbacks);
+            return router.post(route('v1.org.units.add:post'), data, visitOptions);
         },
         [formModeFlags.isEditOrManageMode, form, routeParams.modelIdentifier, routeParams.prefixedId],
     );
@@ -150,7 +159,7 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
         router.delete(route('v1.sys.orgs.force_delete:delete', routeParams.modelIdentifier ?? routeParams?.prefixedId), {
             onSuccess: () => setServerErrors({}),
             onError: (errors) => {
-                console.error('Error perma deleting organization:', errors);
+                console.error('Error permanent deleting:', errors);
                 setServerErrors(errors);
             },
             onFinish: () => setIsConfirmAlertOpen(false),
@@ -261,45 +270,64 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
                                 <FormLabelConditional required>
                                     <FormLabel>Unit Type</FormLabel>
                                 </FormLabelConditional>
-                                <FormControl>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select a unit type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {orgUnitTypes.map(({ value, label, icon: Icon, color }) => (
-                                                <SelectItem key={value} value={value} className={`flex items-center gap-2 ${color}`}>
-                                                    <Icon className="h-4 w-4" />
-                                                    {label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </FormControl>
+                                <CustomizableCombobox
+                                    selectedValue={field.value}
+                                    staticOptions={orgUnitTypeOptions}
+                                    disableDeSelectingOption
+                                    onChange={(value) => field.onChange(value === '' ? undefined : value)}
+                                />
                                 <FormDescription>This defines the structural category of the organization unit.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
 
-                    {/* Unit Type */}
+                    {/* Parent Unit */}
                     <FormField
                         control={form.control}
-                        name="type"
+                        name="parent_unit_id"
                         render={({ field }) => (
                             <FormItem className="max-w-2xl">
                                 <FormLabelConditional required>
-                                    <FormLabel>Unit Type</FormLabel>
+                                    <FormLabel>Parent Unit</FormLabel>
                                 </FormLabelConditional>
                                 <CustomizableCombobox
-                                    currentValue={field.value}
-                                    initialValue={field.value}
-                                    staticOptions={orgUnitTypeOptions}
+                                    selectedValue={field.value ?? ''}
+                                    persistedValue={''}
                                     onChange={(value) => {
-                                        setValue('type', value as OrganizationUnitEnum);
+                                        const converted = typeof value === 'string' && value.trim() !== '' ? Number(value) : undefined;
+                                        field.onChange(converted);
                                     }}
+                                    dataSource={{
+                                        queryKeys: ['unit', 'parent'],
+                                        endpoint: route('v1.req.org.units.options:post'),
+                                    }}
+                                    labels={{
+                                        selectedValuePlaceholder: 'No Parent (Top Level)',
+                                    }}
+                                    disableHoverableOption={true}
                                 />
-                                <FormDescription>This defines the structural category of the organization unit.</FormDescription>
+                                <FormDescription>
+                                    Select the parent unit this unit belongs to. Leave it blank to make this a top-level unit with no parent.
+                                </FormDescription>
+
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* Descriptions Field */}
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                            <FormItem className="max-w-2xl">
+                                <FormLabelConditional>
+                                    <FormLabel>Unit Description</FormLabel>
+                                </FormLabelConditional>
+                                <FormControl>
+                                    <Textarea placeholder="Unit description here..." rows={4} {...field} value={field.value ?? ''} />
+                                </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -322,25 +350,7 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
 
                     {/* Error Alert */}
                     <div className="max-w-2xl">
-                        {Object.keys(serverErrors).length > 0 && (
-                            <Alert className="mt-4 bg-muted">
-                                <AlertCircleIcon className="h-4 w-4 text-red-500 dark:text-red-400" />
-                                <AlertTitle className="text-red-500 dark:text-red-400">Submission failed due to validation errors.</AlertTitle>
-                                <AlertDescription>
-                                    <ul className="mt-2 list-inside list-disc space-y-1 text-sm">
-                                        {Object.entries(serverErrors).map(([key, message]) => (
-                                            <li key={key}>
-                                                <span className="font-medium text-muted-foreground capitalize dark:text-gray-400">
-                                                    {key.replace(/_/g, ' ')}
-                                                </span>
-                                                {': '}
-                                                <span className="text-red-600 dark:text-red-400">{message}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </AlertDescription>
-                            </Alert>
-                        )}
+                        <ServerErrorAlert errors={serverErrors} />
                     </div>
                 </form>
             </Form>
@@ -351,40 +361,14 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
                     {dataStateFlags.isCurrentlyActive && (
                         <Button
                             type="button"
-                            onClick={() => handleOpenConfirmation('deactivate')}
+                            onClick={() => handleOpenConfirmation('delete')}
                             className="w-full cursor-pointer"
-                            variant="outline"
+                            variant="destructive"
                             disabled={controlFlags.disableActionButtons || isSubmitting}
                         >
-                            {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <AlertCircleIcon className="mr-2 h-4 w-4" />}
-                            Deactivate
+                            {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                            Permanently delete
                         </Button>
-                    )}
-
-                    {dataStateFlags.isCurrentlyInactive && (
-                        <>
-                            <Button
-                                type="button"
-                                onClick={() => handleOpenConfirmation('restore')}
-                                className="w-full cursor-pointer"
-                                variant="outline"
-                                disabled={controlFlags.disableActionButtons || isSubmitting}
-                            >
-                                {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <AlertCircleIcon className="mr-2 h-4 w-4" />}
-                                Restore
-                            </Button>
-
-                            <Button
-                                type="button"
-                                onClick={() => handleOpenConfirmation('delete')}
-                                className="w-full cursor-pointer"
-                                variant="destructive"
-                                disabled={controlFlags.disableActionButtons || isSubmitting}
-                            >
-                                {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
-                                Permanently delete
-                            </Button>
-                        </>
                     )}
                 </div>
             )}

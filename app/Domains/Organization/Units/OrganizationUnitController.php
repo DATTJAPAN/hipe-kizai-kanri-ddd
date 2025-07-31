@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace App\Domains\Organization\Units;
 
 use App\Domains\Shared\Data\Request\DatatableRequestData;
+use App\Domains\Shared\Data\Request\ModelRequestData;
 use App\Domains\Shared\Data\Response\ResponseFormData;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Exception;
 
 class OrganizationUnitController
 {
-    public function __construct(private OrganizationUnitService $service)
-    {
-    }
+    public function __construct(private OrganizationUnitService $service) {}
 
     public function dashboard(): Response
     {
@@ -38,11 +38,76 @@ class OrganizationUnitController
             );
         }
 
+        // ---> We assume it's for update
+        try {
+            $requestData = ModelRequestData::fromRequest(request: $request);
+
+            if ($requestData->trashed) {
+                $this->service->repository->showTrashedData();
+            }
+
+            $model = $this->service->findByPrefixedId(identifier: $prefixedId);
+
+            return Inertia::render(
+                component: $inertiaPage,
+                props: [
+                    'context' => [
+                        'form' => ResponseFormData::forPrefixed(
+                            data: OrganizationUnitResourceData::from($model)->toArray(),
+                            id: $model?->prefixed_id
+                        )->toArray(),
+                    ],
+                ]
+            );
+        } catch (OrganizationUnitException $e) {
+            logger()?->error($e->getMessage(), ['prefixed_id' => $prefixedId]);
+
+            return Inertia::render(
+                component: $inertiaPage,
+                props: [
+                    'context' => [
+                        'form' => ResponseFormData::forMissingManage()->toArray(),
+                        'error' => $e->getMessage(),
+                    ],
+                ]
+            );
+        } catch (Exception $e) {
+            logger()?->error('Unexpected error: '.$e->getMessage(), ['prefixed_id' => $prefixedId]);
+
+            return Inertia::render(
+                component: $inertiaPage,
+                props: [
+                    'context' => [
+                        'form' => ResponseFormData::forUnknown()->toArray(),
+                        'error' => 'An unexpected error occurred',
+                    ],
+                ]
+            );
+        }
 
         return Inertia::render($inertiaPage);
     }
 
-    public function datatable(DatatableRequestData $requestData): \Illuminate\Http\JsonResponse
+    public function addHandler(OrganizationUnitFormData $data)
+    {
+        try {
+            $model = $this->service->create($data->toArray());
+
+            return to_route(
+                'v1.org.units.manage:get',
+                ['prefixedId' => $model->prefixedId]
+            )->with('success', 'Created Successfully');
+        } catch (Exception $e) {
+            logger()?->error('Error: '.$e->getMessage());
+
+            return redirect()
+                ->back()
+                ->withErrors(['error' => $e->getMessage()])
+                ->withInput();
+        }
+    }
+
+    public function datatable(DatatableRequestData $requestData): JsonResponse
     {
         try {
 
@@ -57,7 +122,22 @@ class OrganizationUnitController
             $result = $this->service->dataTable();
 
             return successResponseJson([
-                'data' => $result,
+                'data' => OrganizationUnitResourceData::collect($result),
+            ]);
+        } catch (Exception $e) {
+            return errorResponseJson(
+                ['message' => $e->getMessage()]
+            );
+        }
+    }
+
+    public function options(): JsonResponse
+    {
+        try {
+            $result = $this->service->dataTable();
+
+            return successResponseJson([
+                'data' => OrganizationUnitOptionData::fromCollection($result),
             ]);
         } catch (Exception $e) {
             return errorResponseJson(

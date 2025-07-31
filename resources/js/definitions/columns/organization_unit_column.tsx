@@ -26,6 +26,10 @@ const columns = [
     columnHelper.accessor('type', {
         header: 'Unit Type',
     }),
+
+    columnHelper.accessor('parent_unit_id', {
+        header: 'Parent Unit',
+    }),
 ];
 
 export { columns as getOrganizationUnitColumns };

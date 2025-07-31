@@ -8,18 +8,16 @@ use ArchTech\Enums\From;
 use ArchTech\Enums\Options;
 use ArchTech\Enums\Values;
 
-enum OrganizationUnitType
+enum OrganizationUnitType: string
 {
     use From, Options, Values;
 
-    case DIVISION;
-
-    case DEPARTMENT;
-    case BRANCH;
-    case SECTION;
-    case UNIT;
-
-    case TEAM;
+    case DIVISION = 'DIVISION';
+    case DEPARTMENT = 'DEPARTMENT';
+    case BRANCH = 'BRANCH';
+    case SECTION = 'SECTION';
+    case UNIT = 'UNIT';
+    case TEAM = 'TEAM';
 
     public function label(): string
     {

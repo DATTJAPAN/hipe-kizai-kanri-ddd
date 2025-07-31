@@ -13,7 +13,7 @@ class ResponseFormData extends Data
     public function __construct(
         #[WithCast(EnumCast::class, type: FormModeType::class)]
         public FormModeType $mode,
-        public ?string $key,
+        public string|int|null $key,
         public ?string $key_type,
         public ?string $key_val_type,
         public ?array $data,

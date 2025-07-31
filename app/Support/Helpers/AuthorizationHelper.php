@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
 if (! function_exists('getModelForGuard')) {
     function getModelForGuard(string $guard): ?string
     {
@@ -19,5 +21,14 @@ if (! function_exists('activeGuard')) {
         }
 
         return null;
+    }
+}
+
+if (! function_exists('activeUser')) {
+    function activeUser(): ?Authenticatable
+    {
+        $auth = auth()->guard(name: activeGuard());
+
+        return $auth->check() ? $auth->user() : null;
     }
 }

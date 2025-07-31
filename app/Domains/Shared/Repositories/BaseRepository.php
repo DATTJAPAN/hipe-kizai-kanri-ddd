@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Shared\Repositories;
 
+use Closure;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -27,9 +28,27 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
     protected bool $deletePermanent = false;
 
+    protected ?Closure $applyAlwaysQueryCallback = null;
+
+    protected ?Closure $applyOnceQueryCallback = null;
+
     public function __construct(Model $model)
     {
         $this->model = $model;
+    }
+
+    public function tapQueryAlways(Closure $cb): self
+    {
+        $this->applyAlwaysQueryCallback = $cb;
+
+        return $this;
+    }
+
+    public function tapQueryOnce(Closure $cb): self
+    {
+        $this->applyOnceQueryCallback = $cb;
+
+        return $this;
     }
 
     public function showTrashedData(): self
@@ -102,7 +121,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
         $this->ensureNoEmptyData(data: $data);
 
         return DB::transaction(function () use ($data) {
-            return $this->model::create(attributes: $data);
+            return $this->model->create(attributes: $data);
         });
     }
 
@@ -215,20 +234,29 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
     private function prepareQuery(): \Illuminate\Database\Eloquent\Builder
     {
-        $q = $this->model->newQuery();
+        $query = $this->model->newQuery();
 
         // Check if the model uses SoftDeletes
         if (method_exists(object_or_class: $this->model, method: 'isUsingSoftDeletes') && $this->model->isUsingSoftDeletes()) {
             if ($this->withTrashed) {
-                $q->withTrashed();
+                $query->withTrashed();
             }
 
             if ($this->onlyTrashed) {
-                $q->onlyTrashed();
+                $query->onlyTrashed();
             }
         }
 
-        return $q;
+        if ($this->applyAlwaysQueryCallback) {
+            $query = call_user_func($this->applyAlwaysQueryCallback, $query);
+        }
+
+        if ($this->applyOnceQueryCallback) {
+            $query = call_user_func($this->applyOnceQueryCallback, $query);
+            $this->applyOnceQueryCallback = null;
+        }
+
+        return $query;
     }
 
     private function executeSoftOrForceDeletion(?Model $model): bool

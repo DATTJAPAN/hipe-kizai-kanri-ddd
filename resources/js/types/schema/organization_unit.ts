@@ -9,8 +9,8 @@ import type { CreatorOrgUserId, HeadOrgId, IdAndPrefixedId, ParentUnitId } from 
 export type OrganizationUnit = IdAndPrefixedId & {
     name: string;
     code: string;
-    description: string;
     type: OrganizationUnitType;
+    description: string;
     hierarchy: number;
     is_strict_hierarchy: boolean;
     is_active: boolean;
@@ -30,8 +30,13 @@ const CHAR_LIMITS: Record<string, number> = characterLimitForArray(['name', 'cod
 const schema = z.object({
     name: z.string().trim().min(1, 'Name is required').max(CHAR_LIMITS?.name, `Name must be less than ${CHAR_LIMITS?.name} characters`),
     code: z.string().trim().min(1, 'Code is required').max(CHAR_LIMITS?.code, `Code must be less than ${CHAR_LIMITS?.code} characters`),
-    description: z.string().trim().max(CHAR_LIMITS?.description, `Description must be less than ${CHAR_LIMITS?.description} characters`),
+    description: z
+        .string()
+        .max(CHAR_LIMITS?.description, `Description must be less than ${CHAR_LIMITS?.description} characters`)
+        .nullable()
+        .optional(),
     type: z.enum(OrganizationUnitEnum),
+    parent_unit_id: z.number().nullable().optional(),
 });
 
 const partialSchema = schema.partial();

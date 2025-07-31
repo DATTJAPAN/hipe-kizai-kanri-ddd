@@ -12,7 +12,7 @@ export enum OrganizationUnitEnum {
 
 export type OrganizationUnitType = keyof typeof OrganizationUnitEnum;
 
-export const orgUnitTypes = Object.entries(OrganizationUnitEnum).map(([key, value]) => {
+export const orgUnitTypes = Object.entries(OrganizationUnitEnum).map(([value]) => {
     const styleMap = {
         DIVISION: {
             label: 'Division',
@@ -62,11 +62,36 @@ export const orgUnitTypes = Object.entries(OrganizationUnitEnum).map(([key, valu
         iconColor: config.iconColor,
     };
 });
+
 export const orgUnitTypeOptions: ComboboxOption[] = [
     {
-        id: 'DIVISION',
-        value: 'DIVISION',
-        displayName: 'Division',
-        searchKeywords: ['Division'],
+        key: 'DIVISION',
+        display: 'Division',
+        keywords: ['division'],
     },
-];
+    {
+        key: 'DEPARTMENT',
+        display: 'Department',
+        keywords: ['department', 'dept'],
+    },
+    {
+        key: 'SECTION',
+        display: 'Section',
+        keywords: ['section'],
+    },
+    {
+        key: 'UNIT',
+        display: 'Unit',
+        keywords: ['unit'],
+    },
+    {
+        key: 'TEAM',
+        display: 'Team',
+        keywords: ['team'],
+    },
+].map(({ key, display, keywords }) => ({
+    id: key,
+    value: key,
+    displayName: display,
+    searchKeywords: [key, display, ...keywords].map((k) => k.toUpperCase()),
+}));

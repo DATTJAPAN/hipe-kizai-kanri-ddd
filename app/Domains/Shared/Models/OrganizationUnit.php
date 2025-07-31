@@ -6,6 +6,7 @@ namespace App\Domains\Shared\Models;
 
 use App\Domains\Organization\Organizations\HasOrganization;
 use App\Domains\Organization\Units\OrganizationUnitType;
+use App\Domains\Organization\Users\HasOrganizationUserAsCreator;
 use App\Domains\Organization\Users\OrganizationUser;
 use App\Support\Traits\Model\ModelExtension;
 use Database\Factories\OrganizationUnitFactory;
@@ -20,6 +21,7 @@ class OrganizationUnit extends Model
 {
     use HasFactory;
     use HasOrganization;
+    use HasOrganizationUserAsCreator;
     use HasPrefixedId;
     use ModelExtension;
 
@@ -41,18 +43,20 @@ class OrganizationUnit extends Model
         'creator_org_user_id',
     ];
 
+    protected $with = ['parentUnit'];
+
     // ------------------------------------------------------------------------------
     // Model Relations Methods
     // ------------------------------------------------------------------------------
 
-    public function parentAffiliation(): BelongsTo
+    public function parentUnit(): BelongsTo
     {
-        return $this->belongsTo(self::class, 'parent_affiliation_id');
+        return $this->belongsTo(self::class, 'parent_unit_id');
     }
 
     public function childrenAffiliations(): HasMany
     {
-        return $this->hasMany(self::class, 'parent_affiliation_id');
+        return $this->hasMany(self::class, 'parent_unit_id');
     }
 
     public function headOrganizationUser(): BelongsTo

@@ -16,6 +16,11 @@ class OrganizationUnitService extends BaseService
             repository: new OrganizationUnitRepository(model: $model),
             exceptionClass: OrganizationUnitException::class,
         );
+
+        // Tap on query to always get only organization related data
+        $this->repository->tapQueryAlways(
+            fn ($query) => $query->where('org_id', activeUser()->org_id)
+        );
     }
 
     public function createUsingBuilder(OrganizationUnitBuilder $builder): OrganizationUnit

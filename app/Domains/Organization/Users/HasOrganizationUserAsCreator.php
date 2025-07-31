@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Domains\Organization\Users;
 
-trait HasOrganizationCreator
+trait HasOrganizationUserAsCreator
 {
     protected string $creatorForeignKey = 'creator_org_user_id';
 
-    public static function bootHasOrganizationCreator(): void
+    public static function bootHasOrganizationUserAsCreator(): void
     {
         static::creating(function ($model) {
             $auth = auth()->guard(name: activeGuard());
             $authUser = $auth->check() ? $auth->user() : null;
 
-            // Model will inherit the 'org_id' from the logged User
+            // Auto inject creator attr to model
             if ($authUser instanceof OrganizationUser) {
-                $model->{$this->creatorForeignKey} ??= $authUser->getKey();
+                $model->{$model->creatorForeignKey} ??= $authUser->id ?? $authUser->getKey() ?? null;
             }
         });
     }

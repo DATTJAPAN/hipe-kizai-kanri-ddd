@@ -12,8 +12,7 @@ declare(strict_types=1);
 use App\Domains\Organization\Units\OrganizationUnitController;
 use App\Domains\System\Organizations\OrganizationController;
 
-Route::middleware('guest')->group(function () {
-});
+Route::middleware('guest')->group(function () {});
 
 // Ensure the user is "authenticated" and with a "web" guard
 Route::middleware('auth')
@@ -25,6 +24,8 @@ Route::middleware('auth')
             ->group(function () {
                 Route::post('/', [OrganizationUnitController::class, 'datatable'])
                     ->name('datatable:post');
+                Route::post('/options', [OrganizationUnitController::class, 'options'])
+                    ->name('options:post');
             });
     });
 

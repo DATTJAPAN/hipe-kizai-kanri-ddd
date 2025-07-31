@@ -28,7 +28,7 @@ export interface ComboboxLabels {
 export interface DataSourceConfig {
     queryKeys: string[];
     endpoint: string;
-    headers: Record<string, unknown>;
+    headers?: Record<string, unknown>;
     payload?: Record<string, unknown>;
     onDataFetching?: () => void;
     onDataLoading?: () => void;
@@ -39,11 +39,12 @@ export interface ComboboxProps {
     labels?: ComboboxLabels;
     staticOptions?: ComboboxOption[];
     dataSource?: DataSourceConfig;
-    initialValue?: string | number;
-    currentValue?: string | number;
+    persistedValue?: string | number;
+    selectedValue?: string | number;
     onChange?: (value: string, item?: ComboboxOption) => void;
     disableSelectingOption?: boolean;
     disableDeSelectingOption?: boolean;
+    disableHoverableOption?: boolean;
 }
 
 // Base query key for caching
@@ -59,18 +60,19 @@ const DEFAULT_LABELS = {
     empty: 'Empty',
     loading: 'Loading',
     notFound: 'No results found',
-    current: '*',
+    current: 'original',
 };
 
 export default function CustomizableCombobox({
     labels,
     staticOptions,
     dataSource,
-    initialValue,
-    currentValue,
+    persistedValue,
+    selectedValue,
     onChange,
     disableSelectingOption = false,
     disableDeSelectingOption = false,
+    disableHoverableOption = false,
 }: ComboboxProps) {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -87,7 +89,6 @@ export default function CustomizableCombobox({
         queryKey: [...BASE_QUERY_KEY, ...(dataSource?.queryKeys ?? [])],
         queryFn: async () => {
             if (!dataSource) return [];
-
             const response = await axios.post(dataSource.endpoint, dataSource.payload, { ...XHR_HEADERS, ...dataSource.headers });
 
             return response.data?.data || [];
@@ -113,7 +114,7 @@ export default function CustomizableCombobox({
             return displayLabels.selectedValuePlaceholder;
         }
 
-        const foundOption = options.find((option) => String(option.id) === String(currentValue));
+        const foundOption = options.find((option) => String(option.id) === String(selectedValue));
 
         if (foundOption) {
             return <span className="w-full truncate text-start">{foundOption.displayName}</span>;
@@ -125,8 +126,8 @@ export default function CustomizableCombobox({
     const renderOptions = (items: ComboboxOption[]) => {
         return items?.map((item: ComboboxOption, index: number) => {
             const itemValue = String(item?.id);
-            const currentValueStr = String(currentValue || '');
-            const initialValueStr = String(initialValue || '');
+            const currentValueStr = String(selectedValue || '');
+            const initialValueStr = String(persistedValue || '');
 
             const isSelected = currentValueStr !== '' && currentValueStr === itemValue;
             const isOldValue = initialValueStr && initialValueStr === itemValue;
@@ -171,12 +172,18 @@ export default function CustomizableCombobox({
                     }}
                 >
                     {/* Text indicator in the options list */}
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger className="relative cursor-pointer overflow-hidden">{item.displayName}</TooltipTrigger>
-                            <TooltipContent>{item.displayName}</TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                    {disableHoverableOption ? (
+                        // Don't render tooltip, just plain text
+                        <span className="relative cursor-pointer overflow-hidden">{item.displayName}</span>
+                    ) : (
+                        // Render tooltip normally
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger className="relative cursor-pointer overflow-hidden">{item.displayName}</TooltipTrigger>
+                                <TooltipContent>{item.displayName}</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    )}
 
                     {/* Indicator this is the original value */}
                     {isOldValue && <Badge className="w-fit truncate">{displayLabels?.current}</Badge>}
@@ -201,7 +208,11 @@ export default function CustomizableCombobox({
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent>
+            {/**
+                ref: https://github.com/shadcn-ui/ui/issues/3045
+                use: w-[var(--radix-popover-trigger-width)] to match the width of the current button
+            */}
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)]">
                 <Command
                     filter={(value: string, search: string, keywords: string[] | undefined): 1 | 0 => {
                         const extendedValue: string = `${value} ${keywords?.join(' ')}`.toLowerCase();

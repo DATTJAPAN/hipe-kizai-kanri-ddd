@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Domains\Shared\Services;
 
-use App\Domains\Shared\Models\Organization;
 use App\Domains\Shared\Repositories\BaseRepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
@@ -36,7 +35,7 @@ abstract class BaseService implements BaseServiceInterface
     {
         $this->model = $model;
         $this->repository = $repository;
-        $this->exceptionClass = $exceptionClass;
+        $this->exceptionClass = is_object($exceptionClass) ? $exceptionClass : new $exceptionClass;
     }
 
     public function showTrashedData(): static
@@ -65,37 +64,36 @@ abstract class BaseService implements BaseServiceInterface
         } catch (Throwable $e) {
             throw $this->exceptionClass::unexpected();
         }
-
     }
 
     public function create(array $data): Model
     {
         try {
-            $organization = $this->repository->create($data);
+            $m = $this->repository->create($data);
 
-            if (! $organization instanceof Organization) {
+            if (! $m instanceof $this->model) {
                 throw $this->exceptionClass::createFailed();
             }
 
-            return $organization;
+            return $m;
         } catch (QueryException $e) {
             if (in_array($e->errorInfo[0] ?? '', ['23000', '23505'], true)) {
                 throw $this->exceptionClass::duplicate();
             }
             throw $this->exceptionClass::unexpected();
         } catch (Throwable $e) {
-            throw $this->exceptionClass::unexpected();
+            logger()->error($e->getMessage(), ['err' => $e]);
+            throw $this->exceptionClass::unexpected($e->getMessage());
         }
     }
 
     public function updateByIdOrPrefixedId(int|string $identifier, array $data): Model
     {
         try {
-            $org = $this->repository->updateByIdOrPrefixedId(identifier: $identifier, data: $data);
-            $org instanceof Organization ?: throw $this->exceptionClass::updateFailed();
+            $m = $this->repository->updateByIdOrPrefixedId(identifier: $identifier, data: $data);
+            $m instanceof $this->model ?: throw $this->exceptionClass::updateFailed();
 
-            return $org;
-
+            return $m;
         } catch (QueryException $e) {
             if ('23000' === $e->errorInfo[0] || '23505' === $e->errorInfo[0]) {
                 throw $this->exceptionClass::duplicate();
@@ -112,7 +110,6 @@ abstract class BaseService implements BaseServiceInterface
             $result = $this->repository->deleteByIdOrPrefixedId(identifier: $identifier);
 
             return ! $result ? throw $this->exceptionClass::deleteFailed() : $result;
-
         } catch (Throwable $e) {
             throw $this->exceptionClass::unexpected();
         }
