@@ -147,7 +147,7 @@ export default function CustomizableCombobox({
                     className={cn(
                         'py-1.5',
                         'cursor-pointer',
-                        isSelected && 'selected-state bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300',
+                        isSelected && 'selected-state bg-yellow-100 dark:bg-gray-700 dark:text-yellow-300',
                         !isSelected && 'not-selected-state',
                     )}
                     key={`option-${item.id}-${index}`}

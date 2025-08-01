@@ -2,18 +2,18 @@ import { QueryOptions } from '@/hooks/queries/type';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-function useGetAllOrganizationUnits(options: QueryOptions = {}) {
+function useGetAllOrganizationTags(options: QueryOptions = {}) {
     const { queryKey, url, withTrashed = false, onlyTrashed = false, additionalData = {} } = options;
 
     const QUERY_KEY: string[] = queryKey || [
         'orgs',
         'datatables',
-        'units',
+        'tags',
         ...(withTrashed ? ['with-trashed'] : []),
         ...(onlyTrashed ? ['only-trashed'] : []),
     ];
 
-    const QUERY_URL: string = url || route('v1.req.org.units.datatable:post');
+    const QUERY_URL: string = url || route('v1.req.org.tags.datatable:post');
 
     const QUERY_DATA = {
         withTrashed,
@@ -36,4 +36,4 @@ function useGetAllOrganizationUnits(options: QueryOptions = {}) {
     });
 }
 
-export { useGetAllOrganizationUnits };
+export { useGetAllOrganizationTags };

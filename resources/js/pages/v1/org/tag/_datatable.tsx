@@ -3,27 +3,31 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getDefaultMRTOptions } from '@/configs/datatables';
-import { getOrganizationUnitColumns } from '@/definitions/columns';
-import { useGetAllOrganizationUnits } from '@/hooks/queries/orgs';
+import { getOrganizationTagColumns } from '@/definitions/columns';
+import { useGetAllOrganizationTags } from '@/hooks/queries/orgs';
 import { cn } from '@/lib/utils';
-import { OrganizationUnit } from '@/types/schema';
+import { OrganizationTag } from '@/types/schema';
 import { Link } from '@inertiajs/react';
 import { AlertTriangle, RefreshCw, SquarePen } from 'lucide-react';
 import { MantineReactTable, type MRT_ColumnDef, useMantineReactTable } from 'mantine-react-table';
 import { useMemo } from 'react';
 
-export default function OrgUnitDashboardDataTable() {
-    const { isPending, isFetching, error, data = [], refetch } = useGetAllOrganizationUnits();
+export default function OrgTagDashboardDataTable() {
+    const { isPending, isFetching, error, data = [], refetch } = useGetAllOrganizationTags();
 
-    const columns = useMemo<MRT_ColumnDef<OrganizationUnit>[]>(() => getOrganizationUnitColumns, []);
+    const columns = useMemo<MRT_ColumnDef<OrganizationTag>[]>(() => getOrganizationTagColumns, []);
 
-    const defaultMRTOptions = getDefaultMRTOptions<OrganizationUnit>();
+    const defaultMRTOptions = getDefaultMRTOptions<OrganizationTag>();
 
     const handleRefetch = () => {
         refetch();
     };
 
-    const table = useMantineReactTable<OrganizationUnit>({
+    const _handleRedirectRoute = (prefixedId: string = '') => {
+        return route('v1.org.tags.manage:get', prefixedId);
+    };
+
+    const table = useMantineReactTable<OrganizationTag>({
         ...defaultMRTOptions,
         columns,
         data,
@@ -67,9 +71,9 @@ export default function OrgUnitDashboardDataTable() {
                             size="icon"
                             className="group h-8 w-8 border-green-300 text-green-600 hover:border-green-400 hover:bg-green-50 hover:text-green-700"
                         >
-                            <Link href={route('v1.org.units.manage:get', row.original.prefixed_id)}>
+                            <Link href={_handleRedirectRoute(row.original.prefixed_id)}>
                                 <SquarePen className="h-4 w-4 text-green-500 group-hover:text-green-700" />
-                                <span className="sr-only">Manage Organization Unit</span>
+                                <span className="sr-only">Manage Organization Tag</span>
                             </Link>
                         </Button>
                     </TooltipTrigger>

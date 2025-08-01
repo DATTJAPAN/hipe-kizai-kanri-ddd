@@ -247,6 +247,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
             }
         }
 
+        // Entry point for Service
         if ($this->applyAlwaysQueryCallback) {
             $query = call_user_func($this->applyAlwaysQueryCallback, $query);
         }

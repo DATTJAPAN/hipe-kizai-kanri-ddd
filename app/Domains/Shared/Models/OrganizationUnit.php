@@ -10,6 +10,8 @@ use App\Domains\Organization\Users\HasOrganizationUserAsCreator;
 use App\Domains\Organization\Users\OrganizationUser;
 use App\Support\Traits\Model\ModelExtension;
 use Database\Factories\OrganizationUnitFactory;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -73,6 +75,28 @@ class OrganizationUnit extends Model
             'org_user_id'
         )
             ->withTimestamps();
+    }
+
+    #[Scope]
+    public function notPointingBackTo(Builder $query, int|string $parentIdentifier): Builder
+    {
+        $parentId = $parentIdentifier;
+
+        if (is_string($parentIdentifier)) {
+            $parentId = self::findByPrefixedId($parentIdentifier)->id;
+        }
+
+        // If prefixed_id doesn't exist, treat as if no parent found (exclude all pointing to null)
+        if (is_null($parentId)) {
+            return $query;
+        }
+
+        $query->where(function ($q) use ($parentId) {
+            $q->whereNull('parent_unit_id')
+                ->orWhere('parent_unit_id', '!=', $parentId);
+        })->where('id', '!=', $parentId);
+
+        return $query;
     }
 
     // ------------------------------------------------------------------------------

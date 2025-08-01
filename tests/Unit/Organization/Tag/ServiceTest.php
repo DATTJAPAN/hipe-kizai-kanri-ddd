@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Organization\Tag;
 
-use App\Domains\Organization\Tags\OrganizationTag;
 use App\Domains\Organization\Tags\OrganizationTagException;
 use App\Domains\Organization\Tags\OrganizationTagService;
 use App\Domains\Organization\Users\OrganizationUser;
 use App\Domains\Shared\Domains\Organizations\Organization;
+use App\Domains\Shared\Models\OrganizationTag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

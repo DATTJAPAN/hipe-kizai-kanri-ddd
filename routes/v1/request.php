@@ -9,6 +9,8 @@ declare(strict_types=1);
  */
 
 // Ensure the user is not "authenticated"
+
+use App\Http\Controllers\Organization\OrganizationTagController;
 use App\Http\Controllers\Organization\OrganizationUnitController;
 use App\Http\Controllers\System\OrganizationController;
 
@@ -26,6 +28,13 @@ Route::middleware('auth')
                     ->name('datatable:post');
                 Route::post('/options', [OrganizationUnitController::class, 'options'])
                     ->name('options:post');
+            });
+
+        Route::prefix('tags')
+            ->name('tags.')
+            ->group(function () {
+                Route::post('/', [OrganizationTagController::class, 'datatable'])->name('datatable:post');
+                Route::post('/options', [OrganizationTagController::class, 'options'])->name('options:post');
             });
     });
 

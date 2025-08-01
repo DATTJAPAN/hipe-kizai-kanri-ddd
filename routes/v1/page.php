@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Organization\OrganizationController;
+use App\Http\Controllers\Organization\OrganizationTagController;
 use App\Http\Controllers\Organization\OrganizationUnitController;
 use App\Http\Controllers\System\OrganizationController as SystemOrganizationController;
 use App\Http\Controllers\System\SystemController;
@@ -24,7 +25,14 @@ Route::middleware(['auth:web', 'auth'])
             ->name('units.')
             ->group(function () {
                 Route::get('/', [OrganizationUnitController::class, 'dashboard'])->name('dashboard:get');
-                Route::get('/manage/{prefixedId?}', [OrganizationUnitController::class, 'manage'])->name('manage:get');
+                Route::get('manage/{prefixedId?}', [OrganizationUnitController::class, 'manage'])->name('manage:get');
+            });
+
+        Route::prefix('tags')
+            ->name('tags.')
+            ->group(function () {
+                Route::get('/', [OrganizationTagController::class, 'dashboard'])->name('dashboard:get');
+                Route::get('manage/{prefixedId?}', [OrganizationTagController::class, 'manage'])->name('manage:get');
             });
     });
 

@@ -7,19 +7,17 @@ import FormLabelConditional from '@/components/labels/form-label-conditional';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useFormControlFlags } from '@/hooks/forms/computed/use-form-control-flags';
 import { useFormDataStateFlags } from '@/hooks/forms/computed/use-form-data-state-flags';
 import { useFormModeFlags } from '@/hooks/forms/computed/use-form-mode-flags';
 import { FormConfirmActionType, FormProps } from '@/types/app';
-import { orgUnitTypeOptions } from '@/types/enums/organization_unit_enum';
 import {
-    OrganizationUnit,
-    organizationUnitCharacterLimits,
-    OrganizationUnitCreateType,
-    organizationUnitPartialSchema,
-    organizationUnitSchema,
-    OrganizationUnitUpdateType,
+    OrganizationTag,
+    organizationTagCharacterLimits,
+    OrganizationTagCreateType,
+    organizationTagPartialSchema,
+    organizationTagSchema,
+    OrganizationTagUpdateType,
 } from '@/types/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from '@inertiajs/react';
@@ -29,7 +27,7 @@ import { SubmitErrorHandler, useForm } from 'react-hook-form';
 
 type ConfirmActionType = Exclude<FormConfirmActionType, 'create' | 'update' | 'restore' | 'deactivate'>;
 
-export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormStateChange }: FormProps<OrganizationUnit>) {
+export default function OrgUnitManageTagForm({ mode, formKey, formData, onFormStateChange }: FormProps<OrganizationTag>) {
     // ============ STATE MANAGEMENT ============
     const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,9 +35,9 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
     const [confirmActionType, setConfirmActionType] = useState<ConfirmActionType>('delete');
 
     // ============ CONSTANTS & COMPUTED VALUES ============
-    const charLimits = useMemo(() => organizationUnitCharacterLimits, []);
+    const charLimits = useMemo(() => organizationTagCharacterLimits, []);
 
-    const defaultValues: OrganizationUnitCreateType | OrganizationUnitUpdateType = useMemo(
+    const defaultValues: OrganizationTagCreateType | OrganizationTagUpdateType = useMemo(
         () => ({
             name: '',
             code: '',
@@ -76,15 +74,15 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
                 ? {
                       ...defaultValues,
                       ...formData,
-                      parent_unit_id: formData?.parent_unit?.id,
+                      parent_tag_id: formData?.parent_tag?.id,
                   }
                 : defaultValues,
         [formModeFlags.isEditOrManageMode, defaultValues, formData],
     );
 
-    const form = useForm<OrganizationUnitCreateType | OrganizationUnitUpdateType>({
+    const form = useForm<OrganizationTagCreateType | OrganizationTagUpdateType>({
         disabled: controlFlags.disableForm,
-        resolver: zodResolver(formModeFlags.isEditOrManageMode ? organizationUnitPartialSchema : organizationUnitSchema),
+        resolver: zodResolver(formModeFlags.isEditOrManageMode ? organizationTagPartialSchema : organizationTagSchema),
         defaultValues: resolvedDefaultValues,
     });
 
@@ -102,7 +100,7 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
     // ============ EVENT HANDLERS ============
 
     const handleValidSubmit = useCallback(
-        (data: OrganizationUnitCreateType | OrganizationUnitUpdateType) => {
+        (data: OrganizationTagCreateType | OrganizationTagUpdateType) => {
             console.log('Form submitted with data:', data);
             setIsSubmitting(true);
 
@@ -124,18 +122,18 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
 
             if (formModeFlags.isEditOrManageMode) {
                 return router.put(
-                    route('v1.org.units.update:put', { prefixedId: routeParams.modelIdentifier ?? routeParams.prefixedId }),
+                    route('v1.org.tags.update:put', { prefixedId: routeParams.modelIdentifier ?? routeParams.prefixedId }),
                     data,
                     visitOptions,
                 );
             }
 
-            return router.post(route('v1.org.units.add:post'), data, visitOptions);
+            return router.post(route('v1.org.tags.add:post'), data, visitOptions);
         },
         [formModeFlags.isEditOrManageMode, form, routeParams.modelIdentifier, routeParams.prefixedId],
     );
 
-    const handleInvalidSubmit: SubmitErrorHandler<OrganizationUnitCreateType | OrganizationUnitUpdateType> = useCallback((errors) => {
+    const handleInvalidSubmit: SubmitErrorHandler<OrganizationTagCreateType | OrganizationTagUpdateType> = useCallback((errors) => {
         console.error('Form submission errors:', errors);
     }, []);
 
@@ -157,23 +155,10 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
     const handlePermanentDelete = useCallback(() => {
         if (!formModeFlags.isEditOrManageMode) return;
 
-        router.delete(route('v1.org.units.delete:delete', routeParams.modelIdentifier ?? routeParams?.prefixedId), {
+        router.delete(route('v1.org.tags.delete:delete', routeParams.modelIdentifier ?? routeParams?.prefixedId), {
             onSuccess: () => setServerErrors({}),
             onError: (errors) => {
                 console.error('Error permanent deleting:', errors);
-                setServerErrors(errors);
-            },
-            onFinish: () => setIsConfirmAlertOpen(false),
-        });
-    }, [formModeFlags.isEditOrManageMode, routeParams.modelIdentifier, routeParams?.prefixedId]);
-
-    const handleDeactivate = useCallback(() => {
-        if (!formModeFlags.isEditOrManageMode) return;
-
-        router.delete(route('v1.sys.orgs.soft_delete:delete', routeParams.modelIdentifier ?? routeParams?.prefixedId), {
-            onSuccess: () => setServerErrors({}),
-            onError: (errors) => {
-                console.error('Error deleting organization:', errors);
                 setServerErrors(errors);
             },
             onFinish: () => setIsConfirmAlertOpen(false),
@@ -210,14 +195,14 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
                         render={({ field }) => (
                             <FormItem className="max-w-2xl">
                                 <FormLabelConditional required>
-                                    <FormLabel>Unit Name</FormLabel>
+                                    <FormLabel>Tag Name</FormLabel>
                                 </FormLabelConditional>
                                 <InputCounter maxLength={charLimits.name} value={field.value ?? ''}>
                                     <FormControl>
-                                        <Input placeholder="ex. AI Division " maxLength={charLimits.name} {...field} value={field.value ?? ''} />
+                                        <Input placeholder="ex. Equipment" maxLength={charLimits.name} {...field} value={field.value ?? ''} />
                                     </FormControl>
                                 </InputCounter>
-                                <FormDescription>This is your organization's unit display name.</FormDescription>
+                                <FormDescription>This is your organization's tag display name.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
@@ -230,60 +215,38 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
                         render={({ field }) => (
                             <FormItem className="max-w-2xl">
                                 <FormLabelConditional required>
-                                    <FormLabel>Unit Code</FormLabel>
+                                    <FormLabel>Tag Code</FormLabel>
                                 </FormLabelConditional>
                                 <InputCounter maxLength={charLimits.code} value={field.value ?? ''}>
                                     <FormControl>
-                                        <Input placeholder="ex. AIDIV001" maxLength={charLimits.code} {...field} value={field.value ?? ''} />
+                                        <Input placeholder="ex. EQ001" maxLength={charLimits.code} {...field} value={field.value ?? ''} />
                                     </FormControl>
                                 </InputCounter>
-                                <FormDescription>This is your organization's unit unique code.</FormDescription>
+                                <FormDescription>This is your organization's tag unique code.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
 
-                    {/* Unit Type */}
+                    {/* Parent TAG */}
                     <FormField
                         control={form.control}
-                        name="type"
-                        render={({ field }) => (
-                            <FormItem className="max-w-2xl">
-                                <FormLabelConditional required>
-                                    <FormLabel>Unit Type</FormLabel>
-                                </FormLabelConditional>
-                                <CustomizableCombobox
-                                    persistedValue={formData?.type}
-                                    selectedValue={field.value}
-                                    staticOptions={orgUnitTypeOptions}
-                                    disableDeSelectingOption
-                                    onChange={(value) => field.onChange(value === '' ? undefined : value)}
-                                />
-                                <FormDescription>This defines the structural category of the organization unit.</FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    {/* Parent Unit */}
-                    <FormField
-                        control={form.control}
-                        name="parent_unit_id"
+                        name="parent_tag_id"
                         render={({ field }) => (
                             <FormItem className="max-w-2xl">
                                 <FormLabelConditional>
-                                    <FormLabel>Parent Unit</FormLabel>
+                                    <FormLabel>Parent Tag</FormLabel>
                                 </FormLabelConditional>
                                 <CustomizableCombobox
-                                    persistedValue={formData?.parent_unit?.id ?? ''}
+                                    persistedValue={formData?.parent_tag?.id ?? ''}
                                     selectedValue={field.value ?? ''}
                                     onChange={(value) => {
                                         const converted = value?.trim() !== '' ? Number(value) : undefined;
                                         field.onChange(converted);
                                     }}
                                     dataSource={{
-                                        queryKeys: ['unit', 'parent'],
-                                        endpoint: route('v1.req.org.units.options:post'),
+                                        queryKeys: ['tag', 'parent'],
+                                        endpoint: route('v1.req.org.tags.options:post'),
                                         payload: {
                                             exclude: { prefixed_id: routeParams?.prefixedId },
                                             scopes: { notPointingBackTo: [routeParams?.prefixedId] },
@@ -295,26 +258,9 @@ export default function OrgUnitManageUnitForm({ mode, formKey, formData, onFormS
                                     disableHoverableOption={true}
                                 />
                                 <FormDescription>
-                                    Select the parent unit this unit belongs to. Leave it blank to make this a top-level unit with no parent.
+                                    Select the parent this tag belongs to. Leave it blank to make this a top-level tag with no parent.
                                 </FormDescription>
 
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    {/* Descriptions Field */}
-                    <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                            <FormItem className="max-w-2xl">
-                                <FormLabelConditional>
-                                    <FormLabel>Unit Description</FormLabel>
-                                </FormLabelConditional>
-                                <FormControl>
-                                    <Textarea placeholder="Unit description here..." rows={4} {...field} value={field.value ?? ''} />
-                                </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}

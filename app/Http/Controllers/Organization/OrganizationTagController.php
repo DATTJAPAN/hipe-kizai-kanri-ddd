@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Organization;
 
+use App\Domains\Organization\Tags\OrganizationTagFormData;
+use App\Domains\Organization\Tags\OrganizationTagOptionData;
+use App\Domains\Organization\Tags\OrganizationTagResourceData;
+use App\Domains\Organization\Tags\OrganizationTagService;
 use App\Domains\Organization\Units\OrganizationUnitException;
-use App\Domains\Organization\Units\OrganizationUnitFormData;
-use App\Domains\Organization\Units\OrganizationUnitOptionData;
-use App\Domains\Organization\Units\OrganizationUnitResourceData;
-use App\Domains\Organization\Units\OrganizationUnitService;
 use App\Domains\Shared\Data\Request\DatatableRequestData;
 use App\Domains\Shared\Data\Request\ModelRequestData;
 use App\Domains\Shared\Data\Request\OptionRequestData;
@@ -17,32 +17,32 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Inertia\Response;
 
-class OrganizationUnitController
+class OrganizationTagController
 {
-    public function __construct(private OrganizationUnitService $service) {}
+    private string $componentDashboard = 'v1/org/tag/dashboard';
+
+    private string $componentManagement = 'v1/org/tag/manage-tag';
+
+    private string $handlerRedirectTo = 'v1.org.tags.manage:get';
+
+    public function __construct(private OrganizationTagService $service) {}
 
     public function dashboard(): Response
     {
-        return Inertia::render(component: 'v1/org/unit/dashboard');
+        return inertia()->render($this->componentDashboard);
     }
 
     public function manage(Request $request, ?string $prefixedId = null): Response
     {
-        $inertiaPage = 'v1/org/unit/manage-unit';
-
         // ---> We assume it's for creation
         if (is_null($prefixedId)) {
-            return Inertia::render(
-                component: $inertiaPage,
-                props: [
-                    'context' => [
-                        'form' => ResponseFormData::forCreate()->toArray(),
-                    ],
-                ]
-            );
+            return inertia()->render($this->componentManagement, [
+                'context' => [
+                    'form' => ResponseFormData::forCreate()->toArray(),
+                ],
+            ]);
         }
 
         // ---> We assume it's for update
@@ -55,51 +55,42 @@ class OrganizationUnitController
 
             $model = $this->service->findByPrefixedId(identifier: $prefixedId);
 
-            return Inertia::render(
-                component: $inertiaPage,
-                props: [
-                    'context' => [
-                        'form' => ResponseFormData::forPrefixed(
-                            data: OrganizationUnitResourceData::from($model)->toArray(),
-                            id: $model?->prefixed_id
-                        )->toArray(),
-                    ],
-                ]
-            );
+            return inertia()->render($this->componentManagement, [
+                'context' => [
+                    'form' => ResponseFormData::forPrefixed(
+                        data: OrganizationTagResourceData::from($model)->toArray(),
+                        id: $model?->prefixed_id
+                    )->toArray(),
+                ],
+            ]);
         } catch (OrganizationUnitException $e) {
             logger()?->error($e->getMessage(), ['prefixed_id' => $prefixedId]);
 
-            return Inertia::render(
-                component: $inertiaPage,
-                props: [
-                    'context' => [
-                        'form' => ResponseFormData::forMissingManage()->toArray(),
-                        'error' => $e->getMessage(),
-                    ],
-                ]
-            );
+            return inertia()->render($this->componentManagement, [
+                'context' => [
+                    'form' => ResponseFormData::forMissingManage()->toArray(),
+                    'error' => $e->getMessage(),
+                ],
+            ]);
         } catch (Exception $e) {
             logger()?->error('Unexpected error: '.$e->getMessage(), ['prefixed_id' => $prefixedId]);
 
-            return Inertia::render(
-                component: $inertiaPage,
-                props: [
-                    'context' => [
-                        'form' => ResponseFormData::forUnknown()->toArray(),
-                        'error' => 'An unexpected error occurred',
-                    ],
-                ]
-            );
+            return inertia()->render($this->componentManagement, [
+                'context' => [
+                    'form' => ResponseFormData::forMissingManage()->toArray(),
+                    'error' => $e->getMessage(),
+                ],
+            ]);
         }
     }
 
-    public function addHandler(OrganizationUnitFormData $data): ?RedirectResponse
+    public function addHandler(OrganizationTagFormData $data): ?RedirectResponse
     {
         try {
             $model = $this->service->create($data->toArray());
 
             return to_route(
-                'v1.org.units.manage:get',
+                $this->handlerRedirectTo,
                 ['prefixedId' => $model->prefixedId]
             )->with('success', 'Created Successfully');
         } catch (Exception $e) {
@@ -112,13 +103,13 @@ class OrganizationUnitController
         }
     }
 
-    public function updateHandler(string $prefixedId, OrganizationUnitFormData $data): ?RedirectResponse
+    public function updateHandler(string $prefixedId, OrganizationTagFormData $data): ?RedirectResponse
     {
         try {
             $model = $this->service->updateByIdOrPrefixedId($prefixedId, $data->toArray());
 
             return to_route(
-                'v1.org.units.manage:get',
+                $this->handlerRedirectTo,
                 ['prefixedId' => $model->prefixedId]
             )->with('success', 'Created Successfully');
         } catch (Exception $e) {
@@ -138,7 +129,7 @@ class OrganizationUnitController
             $this->service->repository->deletePermanently();
             $result = $this->service->deleteByIdOrPrefixedId(identifier: $prefixedId);
 
-            return to_route('v1.org.units.manage:get', [
+            return to_route($this->handlerRedirectTo, [
                 'prefixedId' => $prefixedId,
                 'forceDeleted' => $result,
             ])->with('success', 'Deleted successfully!');
@@ -154,7 +145,6 @@ class OrganizationUnitController
     public function datatable(DatatableRequestData $requestData): JsonResponse
     {
         try {
-
             if ($requestData->onlyTrashed) {
                 $this->service->repository->showOnlyTrashedData();
             }
@@ -162,16 +152,10 @@ class OrganizationUnitController
             if ($requestData->withTrashed) {
                 $this->service->repository->showTrashedData();
             }
-
-            $this->service->repository->tapQueryOnce(
-                fn ($query) => $query
-                    ->with('parentUnit')
-            );
-
             $result = $this->service->dataTable();
 
             return successResponseJson([
-                'data' => OrganizationUnitResourceData::collect(items: $result),
+                'data' => OrganizationTagResourceData::collect(items: $result),
             ]);
         } catch (Exception $e) {
             return errorResponseJson(
@@ -187,7 +171,6 @@ class OrganizationUnitController
                 foreach ($requestData->exclude ?? [] as $column => $value) {
                     $query->where($column, '!=', $value);
                 }
-
                 $query = applyScopesToQuery($query, $requestData->scopes);
 
                 return $query;
@@ -196,7 +179,7 @@ class OrganizationUnitController
             $result = $this->service->dataTable();
 
             return successResponseJson([
-                'data' => OrganizationUnitOptionData::fromCollection($result),
+                'data' => OrganizationTagOptionData::fromCollection($result),
             ]);
         } catch (Exception $e) {
             return errorResponseJson(
