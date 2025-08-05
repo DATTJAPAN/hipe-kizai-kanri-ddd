@@ -14,7 +14,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-
         // Organizations
         Schema::create('organizations', static function (Blueprint $table) {
             $table->id();
@@ -274,16 +273,12 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('organization_networks', function (Blueprint $table) {
+        Schema::create('organization_network_hosts', function (Blueprint $table) {
             $table->id();
             $table->string('prefixed_id')->nullable()->unique();
             // --------------
             $table->string('name')->fulltext();
-            $table->ipAddress('network_address')->unique();
-            $table->unsignedBigInteger('network_address_long')->unique();
-            $table->unsignedTinyInteger('cidr');
-            $table->string('broadcast');
-
+            $table->ipAddress('host_address');
             // ---- Relations and Constraints
             $table->foreignId('org_id')
                 ->index()

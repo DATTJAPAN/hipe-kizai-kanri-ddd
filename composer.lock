@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "df03e0e133e493bc12b590197abfbd4c",
+    "content-hash": "ecaf854ecc433840eb4db860ce92bb03",
     "packages": [
         {
             "name": "amphp/amp",
@@ -3270,6 +3270,69 @@
                 }
             ],
             "time": "2024-12-08T08:18:47+00:00"
+        },
+        {
+            "name": "miken32/network-rules",
+            "version": "v2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/miken32/NetworkRules.git",
+                "reference": "b24443826b220c252cf886fabf1f122d30f44d6a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/miken32/NetworkRules/zipball/b24443826b220c252cf886fabf1f122d30f44d6a",
+                "reference": "b24443826b220c252cf886fabf1f122d30f44d6a",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^10.0|^11.0|^12.0",
+                "illuminate/validation": "^10.0|^11.0|^12.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "fakerphp/faker": "^1.0",
+                "orchestra/testbench": "^8.0|^9.0",
+                "phpunit/phpunit": "^10.5|^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Miken32\\Validation\\Network\\Providers\\ValidationProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Miken32\\Validation\\Network\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "AGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Newton",
+                    "homepage": "https://github.com/miken32/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Laravel validation rules for checking IP addresses and networks",
+            "keywords": [
+                "ip-address",
+                "ip-networking",
+                "laravel",
+                "networking",
+                "subnets",
+                "validation"
+            ],
+            "support": {
+                "issues": "https://github.com/miken32/NetworkRules/issues",
+                "source": "https://github.com/miken32/NetworkRules/tree/v2.1"
+            },
+            "time": "2025-02-08T18:01:48+00:00"
         },
         {
             "name": "monolog/monolog",

@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\Domains\Organization\Locations;
+namespace App\Domains\Organization\Networks;
 
-use App\Domains\Shared\Models\OrganizationLocation;
+use App\Domains\Shared\Models\OrganizationNetworkHost;
 use App\Domains\Shared\Services\BaseService;
 
-class OrganizationLocationService extends BaseService
+class OrganizationNetworkHostService extends BaseService
 {
     public function __construct()
     {
         parent::__construct(
-            model: $model = new OrganizationLocation,
-            repository: new OrganizationLocationRepository(model: $model),
-            exceptionClass: OrganizationLocationException::class,
+            model: $model = new OrganizationNetworkHost,
+            repository: new OrganizationNetworkHostRepository(model: $model),
+            exceptionClass: OrganizationNetworkHostException::class,
         );
 
         // Tap on the query to always get only organization-related data

@@ -39,7 +39,7 @@ const characterLimit = {
     settingValue: 500,
 
     // --- network ---
-    ip: 32,
+    host_cidr: 18,
 } as const;
 
 type CharacterLimitKey = keyof typeof characterLimit;

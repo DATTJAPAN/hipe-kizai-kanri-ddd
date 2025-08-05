@@ -11,9 +11,11 @@ declare(strict_types=1);
 // Ensure the user is not "authenticated"
 
 use App\Http\Controllers\Organization\OrganizationLocationController;
+use App\Http\Controllers\Organization\OrganizationNetworkHostController;
 use App\Http\Controllers\Organization\OrganizationTagController;
 use App\Http\Controllers\Organization\OrganizationUnitController;
 use App\Http\Controllers\System\OrganizationController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {});
 
@@ -27,6 +29,13 @@ Route::middleware('auth')
             ->group(function () {
                 Route::post('/', [OrganizationLocationController::class, 'datatable'])->name('datatable:post');
                 Route::post('/options', [OrganizationLocationController::class, 'options'])->name('options:post');
+            });
+
+        Route::prefix('network_hosts')
+            ->name('network_hosts.')
+            ->group(function () {
+                Route::post('/', [OrganizationNetworkHostController::class, 'datatable'])->name('datatable:post');
+                Route::post('/options', [OrganizationNetworkHostController::class, 'options'])->name('options:post');
             });
 
         Route::prefix('tags')
