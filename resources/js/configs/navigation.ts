@@ -1,5 +1,5 @@
 import { type NavItem } from '@/types';
-import { Building2, IdCard, LayoutGrid, Tag } from 'lucide-react';
+import { Building2, IdCard, LayoutGrid, MapPinned, Tag } from 'lucide-react';
 
 const organizationSideBarNavigation: NavItem[] = [
     {
@@ -8,14 +8,19 @@ const organizationSideBarNavigation: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Organization Unit',
+        title: 'Units',
         href: route('v1.org.units.dashboard:get'),
         icon: IdCard,
     },
     {
-        title: 'Organization Tag',
+        title: 'Tags',
         href: route('v1.org.tags.dashboard:get'),
         icon: Tag,
+    },
+    {
+        title: 'Locations',
+        href: route('v1.org.locations.dashboard:get'),
+        icon: MapPinned,
     },
 ];
 

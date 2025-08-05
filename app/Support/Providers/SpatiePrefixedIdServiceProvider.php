@@ -9,6 +9,7 @@ use App\Domains\Organization\Users\OrganizationUser;
 use App\Domains\Shared\Authorization\Permission;
 use App\Domains\Shared\Authorization\Role;
 use App\Domains\Shared\Models\Organization;
+use App\Domains\Shared\Models\OrganizationLocation;
 use App\Domains\Shared\Models\OrganizationTag;
 use App\Domains\Shared\Models\OrganizationUnit;
 use App\Domains\System\Users\SystemUser;
@@ -34,6 +35,7 @@ class SpatiePrefixedIdServiceProvider extends ServiceProvider
             'org_user-' => OrganizationUser::class,
             'org_unit-' => OrganizationUnit::class,
             'org_tag-' => OrganizationTag::class,
+            'org_loc-' => OrganizationLocation::class,
             'org_network-' => OrganizationNetwork::class,
         ]);
     }

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Organization\OrganizationController;
+use App\Http\Controllers\Organization\OrganizationLocationController;
 use App\Http\Controllers\Organization\OrganizationTagController;
 use App\Http\Controllers\Organization\OrganizationUnitController;
 use App\Http\Controllers\System\OrganizationController as SystemOrganizationController;
@@ -18,22 +19,29 @@ Route::middleware(['auth:web', 'auth'])
     ->name('org.')
     ->group(function () {
         Route::get('/', [OrganizationController::class, 'dashboard'])->name('dashboard:get');
-        // org/units/**/*
-        Route::prefix('units')
-            ->name('units.')
+
+        Route::prefix('locations')
+            ->name('locations.')
             ->group(function () {
-                Route::post('add', [OrganizationUnitController::class, 'addHandler'])->name('add:post');
-                Route::put('update/{prefixedId}', [OrganizationUnitController::class, 'updateHandler'])->name('update:put');
-                Route::delete('delete/{prefixedId}', [OrganizationUnitController::class, 'forceDeleteHandler'])->name('delete:delete');
+                Route::post('add', [OrganizationLocationController::class, 'addHandler'])->name('add:post');
+                Route::put('update/{prefixedId}', [OrganizationLocationController::class, 'updateHandler'])->name('update:put');
+                Route::delete('delete/{prefixedId}', [OrganizationLocationController::class, 'forceDeleteHandler'])->name('delete:delete');
             });
 
-        // org/tags/**/*
         Route::prefix('tags')
             ->name('tags.')
             ->group(function () {
                 Route::post('add', [OrganizationTagController::class, 'addHandler'])->name('add:post');
                 Route::put('update/{prefixedId}', [OrganizationTagController::class, 'updateHandler'])->name('update:put');
                 Route::delete('delete/{prefixedId}', [OrganizationTagController::class, 'forceDeleteHandler'])->name('delete:delete');
+            });
+
+        Route::prefix('units')
+            ->name('units.')
+            ->group(function () {
+                Route::post('add', [OrganizationUnitController::class, 'addHandler'])->name('add:post');
+                Route::put('update/{prefixedId}', [OrganizationUnitController::class, 'updateHandler'])->name('update:put');
+                Route::delete('delete/{prefixedId}', [OrganizationUnitController::class, 'forceDeleteHandler'])->name('delete:delete');
             });
     });
 

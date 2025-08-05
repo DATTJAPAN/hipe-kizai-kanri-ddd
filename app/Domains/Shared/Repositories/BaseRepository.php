@@ -115,7 +115,6 @@ abstract class BaseRepository implements BaseRepositoryInterface
     }
 
     // ---> Create
-
     public function create(array $data): Model
     {
         $this->ensureNoEmptyData(data: $data);

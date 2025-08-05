@@ -37,6 +37,9 @@ const characterLimit = {
     permissionName: 100,
     settingKey: 100,
     settingValue: 500,
+
+    // --- network ---
+    ip: 32,
 } as const;
 
 type CharacterLimitKey = keyof typeof characterLimit;

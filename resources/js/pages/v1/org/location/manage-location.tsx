@@ -5,12 +5,12 @@ import LabelConditional, { type BadgePreset } from '@/components/labels/label-co
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, SharedData } from '@/types';
 import { FormMode } from '@/types/app';
-import { OrganizationTag } from '@/types/schema';
+import { OrganizationLocation } from '@/types/schema';
 import { Head, usePage } from '@inertiajs/react';
 import { useCallback, useMemo, useState } from 'react';
-import OrgTagManageTagForm from './_form';
+import OrgLocationManageLocationForm from './_form';
 
-export default function OrgTagManageTag() {
+export default function OrgLocationManageLocation() {
     // ============ STATE MANAGEMENT ============
     const [formIsDirty, setFormIsDirty] = useState(false);
 
@@ -22,9 +22,9 @@ export default function OrgTagManageTag() {
     // ============ CONSTANTS ============
     const PAGE_CONFIG = useMemo(
         () => ({
-            title: 'Manage Tag',
-            description: 'Manage your organizational tags.',
-            route: route('v1.org.tags.manage:get', prefixedId ?? 'unknown'),
+            title: 'Manage Location',
+            description: 'Manage your organization locations.',
+            route: route('v1.org.locations.manage:get', prefixedId ?? 'unknown'),
         }),
         [prefixedId],
     );
@@ -57,8 +57,8 @@ export default function OrgTagManageTag() {
     const breadcrumbs = useMemo(
         (): BreadcrumbItem[] => [
             {
-                title: 'Organization Tag',
-                href: route('v1.org.tags.dashboard:get'),
+                title: 'Organization Location',
+                href: route('v1.org.locations.dashboard:get'),
             },
             {
                 title: PAGE_CONFIG.title,
@@ -87,10 +87,10 @@ export default function OrgTagManageTag() {
                 <p className="mb-8 text-sm text-muted-foreground">{PAGE_CONFIG.description}</p>
 
                 {/* Form Component */}
-                <OrgTagManageTagForm
+                <OrgLocationManageLocationForm
                     mode={formState.mode}
                     formKey={formMode?.key}
-                    formData={formMode?.data as OrganizationTag}
+                    formData={formMode?.data as OrganizationLocation}
                     onFormStateChange={handleFormStateChange}
                 />
 
@@ -102,7 +102,7 @@ export default function OrgTagManageTag() {
                     description="This entry appears invalid or no longer exists."
                     maxCloseClicks={5}
                     showRedirect
-                    redirectPath={route('v1.org.tags.dashboard:get')}
+                    redirectPath={route('v1.org.locations.dashboard:get')}
                 />
             </div>
         </AppLayout>
