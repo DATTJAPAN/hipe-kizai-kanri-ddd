@@ -98,8 +98,7 @@ trait HasCrudExceptionFactory
 
     protected static function getDefaultTargetClass(): string
     {
-        // Extract class name without namespace
-        return class_basename(static::class);
+        return class_basename(static::class); // Extract class name without namespace
     }
 
     protected static function formatMessage(string $message, ?string $details = null): string

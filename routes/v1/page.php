@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Organization\OrganizationController;
 use App\Http\Controllers\Organization\OrganizationLocationController;
+use App\Http\Controllers\Organization\OrganizationNetworkHostController;
 use App\Http\Controllers\Organization\OrganizationTagController;
 use App\Http\Controllers\Organization\OrganizationUnitController;
 use App\Http\Controllers\System\OrganizationController as SystemOrganizationController;
@@ -26,6 +27,13 @@ Route::middleware(['auth:web', 'auth'])
             ->group(function () {
                 Route::get('/', [OrganizationLocationController::class, 'dashboard'])->name('dashboard:get');
                 Route::get('manage/{prefixedId?}', [OrganizationLocationController::class, 'manage'])->name('manage:get');
+            });
+
+        Route::prefix('network-hosts')
+            ->name('network_hosts.')
+            ->group(function () {
+                Route::get('/', [OrganizationNetworkHostController::class, 'dashboard'])->name('dashboard:get');
+                Route::get('manage/{prefixedId?}', [OrganizationNetworkHostController::class, 'manage'])->name('manage:get');
             });
 
         Route::prefix('tags')

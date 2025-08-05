@@ -1,5 +1,5 @@
 import { type NavItem } from '@/types';
-import { Building2, IdCard, LayoutGrid, MapPinned, Tag } from 'lucide-react';
+import { Building2, IdCard, LayoutGrid, MapPinned, Network, Tag } from 'lucide-react';
 
 const organizationSideBarNavigation: NavItem[] = [
     {
@@ -21,6 +21,11 @@ const organizationSideBarNavigation: NavItem[] = [
         title: 'Locations',
         href: route('v1.org.locations.dashboard:get'),
         icon: MapPinned,
+    },
+    {
+        title: 'Network Host',
+        href: route('v1.org.network_hosts.dashboard:get'),
+        icon: Network,
     },
 ];
 

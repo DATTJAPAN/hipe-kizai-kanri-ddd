@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Organization\OrganizationController;
 use App\Http\Controllers\Organization\OrganizationLocationController;
+use App\Http\Controllers\Organization\OrganizationNetworkHostController;
 use App\Http\Controllers\Organization\OrganizationTagController;
 use App\Http\Controllers\Organization\OrganizationUnitController;
 use App\Http\Controllers\System\OrganizationController as SystemOrganizationController;
@@ -26,6 +27,14 @@ Route::middleware(['auth:web', 'auth'])
                 Route::post('add', [OrganizationLocationController::class, 'addHandler'])->name('add:post');
                 Route::put('update/{prefixedId}', [OrganizationLocationController::class, 'updateHandler'])->name('update:put');
                 Route::delete('delete/{prefixedId}', [OrganizationLocationController::class, 'forceDeleteHandler'])->name('delete:delete');
+            });
+
+        Route::prefix('network_hosts')
+            ->name('network_hosts.')
+            ->group(function () {
+                Route::post('add', [OrganizationNetworkHostController::class, 'addHandler'])->name('add:post');
+                Route::put('update/{prefixedId}', [OrganizationNetworkHostController::class, 'updateHandler'])->name('update:put');
+                Route::delete('delete/{prefixedId}', [OrganizationNetworkHostController::class, 'forceDeleteHandler'])->name('delete:delete');
             });
 
         Route::prefix('tags')
