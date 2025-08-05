@@ -1,6 +1,9 @@
 const characterLimit = {
     default: 100,
 
+    // --- identfier ---
+    code: 10,
+
     // --- profile ---
     name: 100,
     bio: 200,

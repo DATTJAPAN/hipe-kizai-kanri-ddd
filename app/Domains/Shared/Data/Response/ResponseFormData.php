@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Shared\Data\Response;
 
+use App\Domains\Shared\Enums\FormModeType;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Casts\EnumCast;
 use Spatie\LaravelData\Data;
@@ -13,7 +14,7 @@ class ResponseFormData extends Data
     public function __construct(
         #[WithCast(EnumCast::class, type: FormModeType::class)]
         public FormModeType $mode,
-        public ?string $key,
+        public string|int|null $key,
         public ?string $key_type,
         public ?string $key_val_type,
         public ?array $data,

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Domains\Shared\Models;
 
 use App\Domains\Organization\Users\OrganizationUser;
-use App\Domains\Shared\Domains\Authorization\Concerns\HasPermissions;
-use App\Domains\Shared\Domains\Authorization\Contract\HasPermissionContract;
-use App\Domains\Shared\Domains\Authorization\Role;
+use App\Domains\Shared\Authorization\Concerns\HasPermissions;
+use App\Domains\Shared\Authorization\Contract\HasPermissionContract;
+use App\Domains\Shared\Authorization\Role;
 use App\Domains\System\Users\HasSystemAsCreator;
 use App\Support\Traits\Model\ModelExtension;
 use Database\Factories\OrganizationFactory;

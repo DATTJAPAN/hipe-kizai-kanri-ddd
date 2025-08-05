@@ -20,7 +20,7 @@ trait HasOrganization
 
             // Model will inherit the 'org_id' from the logged User
             if ($authUser instanceof OrganizationUser) {
-                $model->{$this->organizationForeignKey} ??= $authUser->org_id;
+                $model->{$model->organizationForeignKey} ??= $authUser->org_id;
             }
         });
     }

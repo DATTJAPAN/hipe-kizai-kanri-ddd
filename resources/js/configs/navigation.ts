@@ -1,11 +1,21 @@
 import { type NavItem } from '@/types';
-import { Building2, LayoutGrid } from 'lucide-react';
+import { Building2, IdCard, LayoutGrid, Tag } from 'lucide-react';
 
 const organizationSideBarNavigation: NavItem[] = [
     {
         title: 'Dashboard',
         href: route('v1.org.dashboard:get'),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Organization Unit',
+        href: route('v1.org.units.dashboard:get'),
+        icon: IdCard,
+    },
+    {
+        title: 'Organization Tag',
+        href: route('v1.org.tags.dashboard:get'),
+        icon: Tag,
     },
 ];
 

@@ -1,15 +1,8 @@
+import { type QueryOptions } from '@/hooks/queries/type';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-interface UseGetAllOrganizationsOptions {
-    queryKey?: string[];
-    url?: string;
-    withTrashed?: boolean;
-    onlyTrashed?: boolean;
-    additionalData?: Record<string, unknown>;
-}
-
-function useGetAllOrganizations(options: UseGetAllOrganizationsOptions = {}) {
+function useGetAllOrganizations(options: QueryOptions = {}) {
     const { queryKey, url, withTrashed = false, onlyTrashed = false, additionalData = {} } = options;
 
     const QUERY_KEY: string[] = queryKey || [
@@ -43,4 +36,3 @@ function useGetAllOrganizations(options: UseGetAllOrganizationsOptions = {}) {
 }
 
 export { useGetAllOrganizations };
-export type { UseGetAllOrganizationsOptions };

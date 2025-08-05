@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Organization\Unit;
 
-use App\Domains\Organization\Units\OrganizationUnit;
 use App\Domains\Organization\Units\OrganizationUnitBuilder;
 use App\Domains\Organization\Units\OrganizationUnitBuilderException;
 use App\Domains\Organization\Units\OrganizationUnitException;
@@ -12,6 +11,7 @@ use App\Domains\Organization\Units\OrganizationUnitService;
 use App\Domains\Organization\Units\OrganizationUnitType;
 use App\Domains\Organization\Users\OrganizationUser;
 use App\Domains\Shared\Domains\Organizations\Organization;
+use App\Domains\Shared\Models\OrganizationUnit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

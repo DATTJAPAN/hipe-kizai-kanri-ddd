@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Domains\Organization\Organizations\OrganizationController;
-use App\Domains\System\Organizations\OrganizationController as SystemOrganizationController;
-use App\Domains\System\System\SystemController;
+use App\Http\Controllers\Organization\OrganizationController;
+use App\Http\Controllers\Organization\OrganizationTagController;
+use App\Http\Controllers\Organization\OrganizationUnitController;
+use App\Http\Controllers\System\OrganizationController as SystemOrganizationController;
+use App\Http\Controllers\System\SystemController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -17,6 +19,21 @@ Route::middleware(['auth:web', 'auth'])
     ->name('org.')
     ->group(function () {
         Route::get('/', [OrganizationController::class, 'dashboard'])->name('dashboard:get');
+
+        // org/**/*
+        Route::prefix('units')
+            ->name('units.')
+            ->group(function () {
+                Route::get('/', [OrganizationUnitController::class, 'dashboard'])->name('dashboard:get');
+                Route::get('manage/{prefixedId?}', [OrganizationUnitController::class, 'manage'])->name('manage:get');
+            });
+
+        Route::prefix('tags')
+            ->name('tags.')
+            ->group(function () {
+                Route::get('/', [OrganizationTagController::class, 'dashboard'])->name('dashboard:get');
+                Route::get('manage/{prefixedId?}', [OrganizationTagController::class, 'manage'])->name('manage:get');
+            });
     });
 
 Route::middleware(['auth:system', 'auth'])

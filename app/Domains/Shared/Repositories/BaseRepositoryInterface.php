@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Shared\Repositories;
 
+use Closure;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -13,6 +14,18 @@ use Illuminate\Support\Collection;
  */
 interface BaseRepositoryInterface
 {
+    public function tapQueryAlways(Closure $cb): self;
+
+    public function tapQueryOnce(Closure $cb): self;
+
+    public function showTrashedData(): self;
+
+    public function showOnlyTrashedData(): self;
+
+    public function withRelations(array $relations): self;
+
+    public function deletePermanently(): self;
+
     // GET DATA'S
     public function dataTable(): EloquentCollection|Collection|array;
 

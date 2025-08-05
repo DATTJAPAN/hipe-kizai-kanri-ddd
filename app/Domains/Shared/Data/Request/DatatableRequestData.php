@@ -16,6 +16,8 @@ class DatatableRequestData extends Data
         #[BooleanType]
         public bool $withTrashed = false,
 
+        public ?array $exclude = null,
+
         public ?array $additionalData = null,
     ) {
         // Ensure mutual exclusivity

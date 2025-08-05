@@ -92,7 +92,7 @@ return new class extends Migration
             $table->string('prefixed_id')->nullable()->unique();
             // --------------
             $table->string('name');
-            $table->string('code')->unique()->nullable();
+            $table->string('code')->index();
             $table->text('description')->nullable();
             $table->enum('type', OrganizationUnitType::options());
             $table->integer('hierarchy')->default(10); // lowest is highest
@@ -181,8 +181,18 @@ return new class extends Migration
             $table->string('prefixed_id')->nullable()->unique();
             // --------------
             $table->string('name');
-            $table->string('code')->unique()->nullable();
+            $table->string('code')->index();
             // --------------
+            $table->foreignId('parent_tag_id')
+                ->index()
+                ->nullable()
+                ->constrained(
+                    table: 'organization_tags',
+                    column: 'id',
+                )
+                ->onDelete('set null')
+                ->onUpdate('cascade');
+
             $table->foreignId('org_id')
                 ->index()
                 ->constrained(

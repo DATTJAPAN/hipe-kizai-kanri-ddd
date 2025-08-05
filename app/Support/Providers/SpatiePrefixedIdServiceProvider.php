@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Support\Providers;
 
 use App\Domains\Organization\Networks\OrganizationNetwork;
-use App\Domains\Organization\Tags\OrganizationTag;
-use App\Domains\Organization\Units\OrganizationUnit;
 use App\Domains\Organization\Users\OrganizationUser;
-use App\Domains\Shared\Domains\Authorization\Permission;
-use App\Domains\Shared\Domains\Authorization\Role;
+use App\Domains\Shared\Authorization\Permission;
+use App\Domains\Shared\Authorization\Role;
 use App\Domains\Shared\Models\Organization;
+use App\Domains\Shared\Models\OrganizationTag;
+use App\Domains\Shared\Models\OrganizationUnit;
 use App\Domains\System\Users\SystemUser;
 use Illuminate\Support\ServiceProvider;
 use Spatie\PrefixedIds\PrefixedIds;

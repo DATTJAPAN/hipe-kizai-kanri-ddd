@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands\Background;
 
-use App\Domains\Shared\Domains\Authorization\Permission;
+use App\Domains\Shared\Authorization\Permission;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use Throwable;

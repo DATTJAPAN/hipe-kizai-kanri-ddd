@@ -79,7 +79,7 @@ export default function SysOrgDashboardDataTable() {
                                 size="sm"
                                 onClick={handleToggleOnlyTrashed}
                                 className={cn(
-                                    'h-8',
+                                    'h-8 cursor-pointer',
                                     showOnlyTrashed
                                         ? 'border-red-600 bg-red-600 text-white hover:bg-red-700'
                                         : 'border-red-300 text-red-600 hover:border-red-400 hover:bg-red-50 hover:text-red-700',
@@ -102,7 +102,7 @@ export default function SysOrgDashboardDataTable() {
                                 size="sm"
                                 onClick={handleToggleWithTrashed}
                                 className={cn(
-                                    'group h-8',
+                                    'group h-8 cursor-pointer',
                                     showWithTrashed
                                         ? 'border-amber-600 bg-amber-600 text-white hover:bg-amber-700'
                                         : 'border-amber-300 text-amber-600 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700',
@@ -128,7 +128,7 @@ export default function SysOrgDashboardDataTable() {
                                 variant="outline"
                                 size="sm"
                                 onClick={handleRefetch}
-                                className="group h-8 border-blue-300 text-blue-600 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
+                                className="group h-8 cursor-pointer border-blue-300 text-blue-600 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700"
                                 disabled={isPending || isFetching}
                             >
                                 <RefreshCw

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Domains\Organization\Networks;
 
-use App\Core\Exceptions\HasExceptionFactory;
+use App\Core\Exceptions\HasCrudExceptionFactory;
 use Exception;
 
 class OrganizationNetworkException extends Exception
 {
-    use HasExceptionFactory;
+    use HasCrudExceptionFactory;
 
     protected static string $defaultMessage = 'Organization Tag Exception';
 

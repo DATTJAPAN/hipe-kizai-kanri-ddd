@@ -9,12 +9,34 @@ declare(strict_types=1);
  */
 
 // Ensure the user is not "authenticated"
-use App\Domains\System\Organizations\OrganizationController;
+
+use App\Http\Controllers\Organization\OrganizationTagController;
+use App\Http\Controllers\Organization\OrganizationUnitController;
+use App\Http\Controllers\System\OrganizationController;
 
 Route::middleware('guest')->group(function () {});
 
 // Ensure the user is "authenticated" and with a "web" guard
-Route::middleware('auth')->group(function () {});
+Route::middleware('auth')
+    ->prefix('org')
+    ->name('org.')
+    ->group(function () {
+        Route::prefix('units')
+            ->name('units.')
+            ->group(function () {
+                Route::post('/', [OrganizationUnitController::class, 'datatable'])
+                    ->name('datatable:post');
+                Route::post('/options', [OrganizationUnitController::class, 'options'])
+                    ->name('options:post');
+            });
+
+        Route::prefix('tags')
+            ->name('tags.')
+            ->group(function () {
+                Route::post('/', [OrganizationTagController::class, 'datatable'])->name('datatable:post');
+                Route::post('/options', [OrganizationTagController::class, 'options'])->name('options:post');
+            });
+    });
 
 // Ensure the user is "authenticated" and with a "system" guard
 Route::middleware('auth:system')

@@ -40,7 +40,7 @@ export default function SysOrgManageForm({ mode, formKey, formData, onFormStateC
     // ============ CONSTANTS & COMPUTED VALUES ============
     const charLimits = useMemo(() => organizationCharacterLimits, []);
 
-    const defaultValues = useMemo(
+    const defaultValues: OrganizationCreateType | OrganizationUpdateType = useMemo(
         () => ({
             name: '',
             business_email: '',

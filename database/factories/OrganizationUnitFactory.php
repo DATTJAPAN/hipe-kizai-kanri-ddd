@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Domains\Organization\Units\OrganizationUnit;
 use App\Domains\Organization\Units\OrganizationUnitType;
 use App\Domains\Organization\Users\OrganizationUser;
 use App\Domains\Shared\Models\Organization;
+use App\Domains\Shared\Models\OrganizationUnit;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
