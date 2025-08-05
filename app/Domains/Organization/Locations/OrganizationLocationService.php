@@ -19,7 +19,10 @@ class OrganizationLocationService extends BaseService
 
         // Tap on the query to always get only organization-related data
         $this->repository->tapQueryAlways(
-            fn ($query) => $query->where('org_id', activeOrganizationUser()->org_id)
+            function ($query) {
+                $query->forOrganization(orgIdOrPrefixedId: activeOrganizationUser()->org_id);
+                return $query;
+            }
         );
     }
 }
