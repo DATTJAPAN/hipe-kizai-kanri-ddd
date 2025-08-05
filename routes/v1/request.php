@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 // Ensure the user is not "authenticated"
 
+use App\Http\Controllers\Organization\OrganizationLocationController;
 use App\Http\Controllers\Organization\OrganizationTagController;
 use App\Http\Controllers\Organization\OrganizationUnitController;
 use App\Http\Controllers\System\OrganizationController;
@@ -21,13 +22,11 @@ Route::middleware('auth')
     ->prefix('org')
     ->name('org.')
     ->group(function () {
-        Route::prefix('units')
-            ->name('units.')
+        Route::prefix('locations')
+            ->name('locations.')
             ->group(function () {
-                Route::post('/', [OrganizationUnitController::class, 'datatable'])
-                    ->name('datatable:post');
-                Route::post('/options', [OrganizationUnitController::class, 'options'])
-                    ->name('options:post');
+                Route::post('/', [OrganizationLocationController::class, 'datatable'])->name('datatable:post');
+                Route::post('/options', [OrganizationLocationController::class, 'options'])->name('options:post');
             });
 
         Route::prefix('tags')
@@ -35,6 +34,15 @@ Route::middleware('auth')
             ->group(function () {
                 Route::post('/', [OrganizationTagController::class, 'datatable'])->name('datatable:post');
                 Route::post('/options', [OrganizationTagController::class, 'options'])->name('options:post');
+            });
+
+        Route::prefix('units')
+            ->name('units.')
+            ->group(function () {
+                Route::post('/', [OrganizationUnitController::class, 'datatable'])
+                    ->name('datatable:post');
+                Route::post('/options', [OrganizationUnitController::class, 'options'])
+                    ->name('options:post');
             });
     });
 

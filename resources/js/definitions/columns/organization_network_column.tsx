@@ -1,8 +1,8 @@
 import { Badge } from '@/components/ui/badge';
-import { OrganizationTag } from '@/types/schema';
+import { OrganizationLocation } from '@/types/schema';
 import { createMRTColumnHelper } from 'mantine-react-table';
 
-const columnHelper = createMRTColumnHelper<OrganizationTag>();
+const columnHelper = createMRTColumnHelper<OrganizationLocation>();
 
 const columns = [
     columnHelper.accessor('prefixed_id', {
@@ -22,11 +22,6 @@ const columns = [
         header: 'Name',
         enableSorting: true,
     }),
-
-    columnHelper.accessor((row) => row.parent_tag?.name ?? '—', {
-        id: 'parent_tag_name',
-        header: 'Parent Tag',
-    }),
 ];
 
-export { columns as getOrganizationTagColumns };
+export { columns as getOrganizationLocationColumns };

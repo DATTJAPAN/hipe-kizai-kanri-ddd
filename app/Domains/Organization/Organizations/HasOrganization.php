@@ -6,6 +6,8 @@ namespace App\Domains\Organization\Organizations;
 
 use App\Domains\Organization\Users\OrganizationUser;
 use App\Domains\Shared\Models\Organization;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 trait HasOrganization
@@ -25,12 +27,26 @@ trait HasOrganization
         });
     }
 
-    public function affiliatedOrganization(): BelongsTo
+    public function parentOrganization(): BelongsTo
     {
         if (method_exists($this, 'belongsTo')) {
-            return $this->belongsTo(Organization::class, 'org_id');
+            return $this->belongsTo(Organization::class, $this->organizationForeignKey);
         }
 
         throw new OrganizationAffiliationException();
+    }
+
+    #[Scope]
+    public function forOrganization(Builder $query, int|string $orgIdOrPrefixedId): Builder
+    {
+        $orgId = is_string($orgIdOrPrefixedId)
+            ? Organization::findByPrefixedId($orgIdOrPrefixedId)?->id
+            : $orgIdOrPrefixedId;
+
+        if (is_null($orgId)) {
+            return $query;
+        }
+
+        return $query->where($this->organizationForeignKey, $orgId);
     }
 }

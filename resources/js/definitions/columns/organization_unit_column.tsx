@@ -27,7 +27,8 @@ const columns = [
         header: 'Unit Type',
     }),
 
-    columnHelper.accessor('parent_unit.name', {
+    columnHelper.accessor((row) => row.parent_unit?.name ?? '—', {
+        id: 'parent_unit_name',
         header: 'Parent Unit',
     }),
 ];

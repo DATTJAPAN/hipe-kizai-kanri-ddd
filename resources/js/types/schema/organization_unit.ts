@@ -17,7 +17,7 @@ export type OrganizationUnit = IdAndPrefixedId & {
     parent_unit_id?: ParentUnitId;
     head_org_user_id?: HeadOrgId;
     creator_org_user_id?: CreatorOrgUserId;
-    parent_unit?: OrganizationUnit | null;
+    parent_unit?: Partial<OrganizationUnit> | null;
 };
 
 // =======================

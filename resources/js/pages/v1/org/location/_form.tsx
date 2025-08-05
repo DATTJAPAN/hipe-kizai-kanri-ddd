@@ -1,23 +1,23 @@
 'use client';
 import ServerErrorAlert from '@/components/alerts/server-error-alert';
-import CustomizableCombobox from '@/components/comboboxes/customizable-combobox';
 import ConfirmDialog from '@/components/dialogs/confirm-dialog';
 import InputCounter from '@/components/inputs/input-counter';
 import FormLabelConditional from '@/components/labels/form-label-conditional';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useFormControlFlags } from '@/hooks/forms/computed/use-form-control-flags';
 import { useFormDataStateFlags } from '@/hooks/forms/computed/use-form-data-state-flags';
 import { useFormModeFlags } from '@/hooks/forms/computed/use-form-mode-flags';
 import { FormConfirmActionType, FormProps } from '@/types/app';
 import {
-    OrganizationTag,
-    organizationTagCharacterLimits,
-    OrganizationTagCreateType,
-    organizationTagPartialSchema,
-    organizationTagSchema,
-    OrganizationTagUpdateType,
+    OrganizationLocation,
+    organizationLocationCharacterLimits,
+    OrganizationLocationCreateType,
+    organizationLocationPartialSchema,
+    organizationLocationSchema,
+    OrganizationLocationUpdateType,
 } from '@/types/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from '@inertiajs/react';
@@ -27,7 +27,7 @@ import { SubmitErrorHandler, useForm } from 'react-hook-form';
 
 type ConfirmActionType = Exclude<FormConfirmActionType, 'create' | 'update' | 'restore' | 'deactivate'>;
 
-export default function OrgTagManageTagForm({ mode, formKey, formData, onFormStateChange }: FormProps<OrganizationTag>) {
+export default function OrgLocationManageLocationForm({ mode, formKey, formData, onFormStateChange }: FormProps<OrganizationLocation>) {
     // ============ STATE MANAGEMENT ============
     const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,15 +35,12 @@ export default function OrgTagManageTagForm({ mode, formKey, formData, onFormSta
     const [confirmActionType, setConfirmActionType] = useState<ConfirmActionType>('delete');
 
     // ============ CONSTANTS & COMPUTED VALUES ============
-    const charLimits = useMemo(() => organizationTagCharacterLimits, []);
+    const charLimits = useMemo(() => organizationLocationCharacterLimits, []);
 
-    const defaultValues: OrganizationTagCreateType | OrganizationTagUpdateType = useMemo(
+    const defaultValues: OrganizationLocationCreateType | OrganizationLocationUpdateType = useMemo(
         () => ({
             name: '',
-            code: '',
             description: '',
-            type: undefined,
-            parent_unit_id: undefined,
         }),
         [],
     );
@@ -74,15 +71,14 @@ export default function OrgTagManageTagForm({ mode, formKey, formData, onFormSta
                 ? {
                       ...defaultValues,
                       ...formData,
-                      parent_tag_id: formData?.parent_tag?.id,
                   }
                 : defaultValues,
         [formModeFlags.isEditOrManageMode, defaultValues, formData],
     );
 
-    const form = useForm<OrganizationTagCreateType | OrganizationTagUpdateType>({
+    const form = useForm<OrganizationLocationCreateType | OrganizationLocationUpdateType>({
         disabled: controlFlags.disableForm,
-        resolver: zodResolver(formModeFlags.isEditOrManageMode ? organizationTagPartialSchema : organizationTagSchema),
+        resolver: zodResolver(formModeFlags.isEditOrManageMode ? organizationLocationPartialSchema : organizationLocationSchema),
         defaultValues: resolvedDefaultValues,
     });
 
@@ -100,7 +96,7 @@ export default function OrgTagManageTagForm({ mode, formKey, formData, onFormSta
     // ============ EVENT HANDLERS ============
 
     const handleValidSubmit = useCallback(
-        (data: OrganizationTagCreateType | OrganizationTagUpdateType) => {
+        (data: OrganizationLocationCreateType | OrganizationLocationUpdateType) => {
             console.log('Form submitted with data:', data);
             setIsSubmitting(true);
 
@@ -122,18 +118,18 @@ export default function OrgTagManageTagForm({ mode, formKey, formData, onFormSta
 
             if (formModeFlags.isEditOrManageMode) {
                 return router.put(
-                    route('v1.org.tags.update:put', { prefixedId: routeParams.modelIdentifier ?? routeParams.prefixedId }),
+                    route('v1.org.locations.update:put', { prefixedId: routeParams.modelIdentifier ?? routeParams.prefixedId }),
                     data,
                     visitOptions,
                 );
             }
 
-            return router.post(route('v1.org.tags.add:post'), data, visitOptions);
+            return router.post(route('v1.org.locations.add:post'), data, visitOptions);
         },
         [formModeFlags.isEditOrManageMode, form, routeParams.modelIdentifier, routeParams.prefixedId],
     );
 
-    const handleInvalidSubmit: SubmitErrorHandler<OrganizationTagCreateType | OrganizationTagUpdateType> = useCallback((errors) => {
+    const handleInvalidSubmit: SubmitErrorHandler<OrganizationLocationCreateType | OrganizationLocationUpdateType> = useCallback((errors) => {
         console.error('Form submission errors:', errors);
     }, []);
 
@@ -155,7 +151,7 @@ export default function OrgTagManageTagForm({ mode, formKey, formData, onFormSta
     const handlePermanentDelete = useCallback(() => {
         if (!formModeFlags.isEditOrManageMode) return;
 
-        router.delete(route('v1.org.tags.delete:delete', routeParams.modelIdentifier ?? routeParams?.prefixedId), {
+        router.delete(route('v1.org.locations.delete:delete', routeParams.modelIdentifier ?? routeParams?.prefixedId), {
             onSuccess: () => setServerErrors({}),
             onError: (errors) => {
                 console.error('Error permanent deleting:', errors);
@@ -195,72 +191,31 @@ export default function OrgTagManageTagForm({ mode, formKey, formData, onFormSta
                         render={({ field }) => (
                             <FormItem className="max-w-2xl">
                                 <FormLabelConditional required>
-                                    <FormLabel>Tag Name</FormLabel>
+                                    <FormLabel>Location Name</FormLabel>
                                 </FormLabelConditional>
                                 <InputCounter maxLength={charLimits.name} value={field.value ?? ''}>
                                     <FormControl>
-                                        <Input placeholder="ex. Equipment" maxLength={charLimits.name} {...field} value={field.value ?? ''} />
+                                        <Input placeholder="ex. Office - 1" maxLength={charLimits.name} {...field} value={field.value ?? ''} />
                                     </FormControl>
                                 </InputCounter>
-                                <FormDescription>This is your organization's tag display name.</FormDescription>
+                                <FormDescription>This is your organization's location display name.</FormDescription>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
 
-                    {/* Code Field */}
+                    {/* Descriptions Field */}
                     <FormField
                         control={form.control}
-                        name="code"
-                        render={({ field }) => (
-                            <FormItem className="max-w-2xl">
-                                <FormLabelConditional required>
-                                    <FormLabel>Tag Code</FormLabel>
-                                </FormLabelConditional>
-                                <InputCounter maxLength={charLimits.code} value={field.value ?? ''}>
-                                    <FormControl>
-                                        <Input placeholder="ex. EQ001" maxLength={charLimits.code} {...field} value={field.value ?? ''} />
-                                    </FormControl>
-                                </InputCounter>
-                                <FormDescription>This is your organization's tag unique code.</FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
-                    {/* Parent TAG */}
-                    <FormField
-                        control={form.control}
-                        name="parent_tag_id"
+                        name="description"
                         render={({ field }) => (
                             <FormItem className="max-w-2xl">
                                 <FormLabelConditional>
-                                    <FormLabel>Parent Tag</FormLabel>
+                                    <FormLabel>Location Description</FormLabel>
                                 </FormLabelConditional>
-                                <CustomizableCombobox
-                                    persistedValue={formData?.parent_tag?.id ?? ''}
-                                    selectedValue={field.value ?? ''}
-                                    onChange={(value) => {
-                                        const converted = value?.trim() !== '' ? Number(value) : undefined;
-                                        field.onChange(converted);
-                                    }}
-                                    dataSource={{
-                                        queryKeys: ['tag', 'parent'],
-                                        endpoint: route('v1.req.org.tags.options:post'),
-                                        payload: {
-                                            exclude: { prefixed_id: routeParams?.prefixedId },
-                                            scopes: { notPointingBackTo: [routeParams?.prefixedId] },
-                                        },
-                                    }}
-                                    labels={{
-                                        selectedValuePlaceholder: 'No Parent (Top Level)',
-                                    }}
-                                    disableHoverableOption={true}
-                                />
-                                <FormDescription>
-                                    Select the parent this tag belongs to. Leave it blank to make this a top-level tag with no parent.
-                                </FormDescription>
-
+                                <FormControl>
+                                    <Textarea placeholder="Location description here..." rows={4} {...field} value={field.value ?? ''} />
+                                </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}

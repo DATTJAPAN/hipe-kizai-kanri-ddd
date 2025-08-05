@@ -245,6 +245,35 @@ return new class extends Migration
             $table->primary(['tag_id', 'taggable_type', 'taggable_id']);
         });
 
+        Schema::create('organization_locations', static function (Blueprint $table) {
+            $table->id();
+            $table->string('prefixed_id')->nullable()->unique();
+            // --------------
+            $table->string('name')->fulltext();
+            $table->string('description')->nullable();
+            // --------------
+            $table->foreignId('org_id')
+                ->index()
+                ->constrained(
+                    table: 'organizations',
+                    column: 'id',
+                )
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+
+            $table->foreignId('creator_org_user_id')
+                ->nullable()
+                ->index()
+                ->constrained(
+                    table: 'organization_users',
+                    column: 'id',
+                )
+                ->onDelete('set null')
+                ->onUpdate('cascade');
+
+            $table->timestamps();
+        });
+
         Schema::create('organization_networks', function (Blueprint $table) {
             $table->id();
             $table->string('prefixed_id')->nullable()->unique();
